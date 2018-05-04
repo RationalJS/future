@@ -1,0 +1,25 @@
+// This is the configuration file used by BuckleScript's build system bsb. Its documentation lives here: http://bucklescript.github.io/bucklescript/docson/#build-schema.json
+// BuckleScript comes with its own parser for bsconfig.json, which is normal JSON, with the extra support of comments and trailing commas.
+{
+  "name": "rational-future",
+  "version": "0.1.0",
+  "sources": [{
+    "dir" : "src",
+    "subdirs" : true
+  }, {
+    "dir" : "tests",
+    "type" : "dev"
+  }],
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": [],
+  "bs-dev-dependencies": ["bs-ospec"],
+  "warnings": {
+    "error" : "+101"
+  },
+  "namespace": false,
+  "refmt": 3
+}

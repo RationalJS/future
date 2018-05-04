@@ -1,0 +1,35 @@
+{
+  "name": "rational-future",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world"
+  },
+  "files": [
+    "src/Future.re",
+    "bsconfig.json",
+    "README.md"
+  ],
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "bs-ospec": "^0.2.0",
+    "bs-platform": "^3.0.0",
+    "ospec": "^1.4.1"
+  },
+  "description": "A Js.Promise alternative for ReasonML.",
+  "main": "index.js",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rationaljs/future.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rationaljs/future/issues"
+  },
+  "homepage": "https://github.com/rationaljs/future#readme"
+}
