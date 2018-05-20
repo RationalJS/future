@@ -18,3 +18,13 @@ let flatMapError = (f, future) => future |> Future.flatMap(r => switch(r) {
   | Js.Result.Error(v) => f(v)
   | Ok(_) => Future.value(r)
 });
+
+let tapOk = (f, future) => future |> Future.tap(r => switch(r) {
+  | Js.Result.Ok(v) => f(v) |> ignore
+  | Error(_) => ()
+});
+
+let tapError = (f, future) => future |> Future.tap(r => switch(r) {
+  | Js.Result.Error(v) => f(v) |> ignore
+  | Ok(_) => ()
+});

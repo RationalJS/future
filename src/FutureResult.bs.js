@@ -44,8 +44,32 @@ function flatMapError(f, future) {
               }), future);
 }
 
+function tapOk(f, future) {
+  return Future.tap((function (r) {
+                if (r.tag) {
+                  return /* () */0;
+                } else {
+                  Curry._1(f, r[0]);
+                  return /* () */0;
+                }
+              }), future);
+}
+
+function tapError(f, future) {
+  return Future.tap((function (r) {
+                if (r.tag) {
+                  Curry._1(f, r[0]);
+                  return /* () */0;
+                } else {
+                  return /* () */0;
+                }
+              }), future);
+}
+
 exports.mapOk = mapOk;
 exports.flatMapOk = flatMapOk;
 exports.mapError = mapError;
 exports.flatMapError = flatMapError;
+exports.tapOk = tapOk;
+exports.tapError = tapError;
 /* No side effect */
