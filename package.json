@@ -1,6 +1,6 @@
 {
   "name": "reason-future",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
@@ -8,6 +8,7 @@
   },
   "files": [
     "src/Future.re",
+    "src/FutureResult.re",
     "bsconfig.json",
     "README.md"
   ],
