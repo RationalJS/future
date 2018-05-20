@@ -18,7 +18,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "bs-ospec": "^0.2.0",
+    "bs-ospec": "^1.0.0",
     "bs-platform": "^3.0.0",
     "ospec": "^1.4.1"
   },

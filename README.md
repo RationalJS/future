@@ -38,12 +38,12 @@ To get the value of a future, use `Future.get`:
 ```js
 let futureGreeting = Future.make(resolve => resolve("hi"));
 futureGreeting
-|> Future.get(x => Js.log("Got value: " ++ x));
+|. Future.get(x => Js.log("Got value: " ++ x));
 
 /* Alternatively: */
 
 Future.make(resolve => resolve("hi"))
-|> Future.get(x => Js.log("Got value: " ++ x));
+|. Future.get(x => Js.log("Got value: " ++ x));
 ```
 
 `Future.get` only *retrieves* the future value. If you want to **transform** it to a *different* value, then you should use `Future.map`:
@@ -52,14 +52,14 @@ Future.make(resolve => resolve("hi"))
 /* Shortcut for: let future_A = Future.make(resolve => resolve(99)); */
 let future_A = Future.value(99);
 
-let future_B = future_A |> Future.map(n => n + 1);
+let future_B = future_A |. Future.map(n => n + 1);
 
 
 future_A
-|> Future.get(n => Js.log(n)); /* logs: 99 */
+|. Future.get(n => Js.log(n)); /* logs: 99 */
 
 future_B
-|> Future.get(n => Js.log(n)); /* logs: 100 */
+|. Future.get(n => Js.log(n)); /* logs: 100 */
 ```
 
 And finally, if you `map` a future and return **another** future, you probably want to `flatMap` instead:
@@ -67,8 +67,8 @@ And finally, if you `map` a future and return **another** future, you probably w
 ```js
 let futureNum = Future.value(50);
 
-let ft_a = futureNum |> Future.map(n => Future.value(n + 10));
-let ft_b = futureNum |> Future.flatMap(n => Future.value(n + 20));
+let ft_a = futureNum |. Future.map(n => Future.value(n + 10));
+let ft_b = futureNum |. Future.flatMap(n => Future.value(n + 20));
 
 /* ft_a has type future(future(int)) – probably not what you want. */
 /* ft_b has type future(int) */
@@ -76,23 +76,23 @@ let ft_b = futureNum |> Future.flatMap(n => Future.value(n + 20));
 
 ## API
 
-Core functions. **Note:** `_` represents the future itself.
+Core functions. **Note:** `_` represents the future itself as inserted by the `|.` operator.
 
 - `Future.make(resolver)` - Create a new, potentially-async future.
 - `Future.value(x)` - Create a new future with a plain value (synchronous).
-- `Future.map(f,_)` - Transform a future value into another value
-- `Future.flatMap(f,_)` - Transform a future value into another future value
-- `Future.get(f,_)` - Get the value of a future
-- `Future.tap(f,_)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
+- `Future.map(_,fn)` - Transform a future value into another value
+- `Future.flatMap(_,fn)` - Transform a future value into another future value
+- `Future.get(_,fn)` - Get the value of a future
+- `Future.tap(_,fn)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
 
 ### FutureResult
 
-Convenience functions when working with a future `Js.Result`. **Note:** `_` represents the future itself.
+Convenience functions when working with a future `Js.Result`. **Note:** `_` represents the future itself as inserted by the `|.` operator.
 
-- `FutureResult.mapOk(f,_)` - Transform a future value into another value, but only if the value is a `Js.Result.Ok`. Similar to `Promise.prototype.then`
-- `FutureResult.mapError(f,_)` - Transform a future value into another value, but only if the value is a `Js.Result.Error`. Similar to `Promise.prototype.catch`
-- `FutureResult.flatMapOk(f,_)` - Same as `mapOk` but flattens.
-- `FutureResult.flatMapError(f,_)` - Same as `mapError` but flattens.
+- `FutureResult.mapOk(_,fn)` - Transform a future value into another value, but only if the value is a `Js.Result.Ok`. Similar to `Promise.prototype.then`
+- `FutureResult.mapError(_,fn)` - Transform a future value into another value, but only if the value is a `Js.Result.Error`. Similar to `Promise.prototype.catch`
+- `FutureResult.flatMapOk(_,fn)` - Same as `mapOk` but flattens.
+- `FutureResult.flatMapError(_,fn)` - Same as `mapError` but flattens.
 
 ## TODO
 

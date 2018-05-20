@@ -9,7 +9,7 @@ let make = (resolver) => {
   resolver(result => switch(data^) {
     | None =>
       data := Some(result);
-      callbacks^ |> List.iter(cb => cb(result));
+      callbacks^ |. List.rev |. List.iter(cb => cb(result), _);
       /* Clean up memory usage */
       callbacks := []
     | Some(_) =>
@@ -25,20 +25,20 @@ let make = (resolver) => {
 let value = (x) => make(resolve => resolve(x));
 
 
-let map = (f, Future(get)) => make(resolve => {
+let map = (Future(get), f) => make(resolve => {
   get(result => resolve(f(result)))
 });
 
-let flatMap = (f, Future(get)) => make(resolve => {
+let flatMap = (Future(get), f) => make(resolve => {
   get(result => {
     let Future(get2) = f(result);
     get2(resolve)
   })
 });
 
-let tap = (f, Future(get) as future) => {
+let tap = (Future(get) as future, f) => {
   get(f);
   future
 };
 
-let get = (f, Future(getFn)) => getFn(f);
+let get = (Future(getFn), f) => getFn(f);
