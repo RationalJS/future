@@ -81,7 +81,7 @@ let ft_b = futureNum.flatMap(n => Future.value(n + 20));
 - `Future.map(f)` - Transform a future value into another value
 - `Future.flatMap(f)` - Transform a future value into another future value
 - `Future.get(f)` - Get the value of a future
-- `Future.tap(f)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for logging.
+- `Future.tap(f)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
 
 ## TODO
 
