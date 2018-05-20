@@ -5,3 +5,4 @@ npm-debug.log
 /lib/bs/
 /node_modules/
 package-lock.json
+*.bs.js
