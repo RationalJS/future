@@ -11,16 +11,16 @@ Compared to a promise, a future is:
 ## Installation
 
 ```
-$ npm install --save rational-future
+$ npm install --save reason-future
 ```
 
-Then add `"rational-future"` to your `bsconfig.json` dev dependencies:
+Then add `"reason-future"` to your `bsconfig.json` dev dependencies:
 
 ```
 {
   ...
   "bs-dependencies": [
-    "rational-future"
+    "reason-future"
   ]
 }
 ```
