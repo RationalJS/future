@@ -67,8 +67,8 @@ And finally, if you `map` a future and return **another** future, you probably w
 ```js
 let futureNum = Future.value(50);
 
-let ft_a = futureNum.map(n => Future.value(n + 10));
-let ft_b = futureNum.flatMap(n => Future.value(n + 20));
+let ft_a = futureNum |> Future.map(n => Future.value(n + 10));
+let ft_b = futureNum |> Future.flatMap(n => Future.value(n + 20));
 
 /* ft_a has type future(future(int)) – probably not what you want. */
 /* ft_b has type future(int) */
@@ -76,12 +76,23 @@ let ft_b = futureNum.flatMap(n => Future.value(n + 20));
 
 ## API
 
+Core functions. **Note:** `_` represents the future itself.
+
 - `Future.make(resolver)` - Create a new, potentially-async future.
 - `Future.value(x)` - Create a new future with a plain value (synchronous).
-- `Future.map(f)` - Transform a future value into another value
-- `Future.flatMap(f)` - Transform a future value into another future value
-- `Future.get(f)` - Get the value of a future
-- `Future.tap(f)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
+- `Future.map(f,_)` - Transform a future value into another value
+- `Future.flatMap(f,_)` - Transform a future value into another future value
+- `Future.get(f,_)` - Get the value of a future
+- `Future.tap(f,_)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
+
+### FutureResult
+
+Convenience functions when working with a future `Js.Result`. **Note:** `_` represents the future itself.
+
+- `FutureResult.mapOk(f,_)` - Transform a future value into another value, but only if the value is a `Js.Result.Ok`. Similar to `Promise.prototype.then`
+- `FutureResult.mapError(f,_)` - Transform a future value into another value, but only if the value is a `Js.Result.Error`. Similar to `Promise.prototype.catch`
+- `FutureResult.flatMapOk(f,_)` - Same as `mapOk` but flattens.
+- `FutureResult.flatMapError(f,_)` - Same as `mapError` but flattens.
 
 ## TODO
 
