@@ -1,22 +1,22 @@
 
 let mapOk = (f, future) => future |> Future.map(r => switch(r) {
   | Js.Result.Ok(v) => f(v)
-  | Error(_) => r
+  | Error(e) => Js.Result.Error(e)
 });
 
 let flatMapOk = (f, future) => future |> Future.flatMap(r => switch(r) {
   | Js.Result.Ok(v) => f(v)
-  | Error(_) => Future.value(r)
+  | Error(e) => Future.value(Js.Result.Error(e))
 });
 
 let mapError = (f, future) => future |> Future.map(r => switch(r) {
   | Js.Result.Error(v) => f(v)
-  | Ok(_) => r
+  | Ok(a) => Js.Result.Error(a)
 });
 
 let flatMapError = (f, future) => future |> Future.flatMap(r => switch(r) {
   | Js.Result.Error(v) => f(v)
-  | Ok(_) => Future.value(r)
+  | Ok(a) => Future.value(Js.Result.Error(a))
 });
 
 let tapOk = (f, future) => future |> Future.tap(r => switch(r) {
