@@ -27,7 +27,7 @@ Then add `"rational-future"` to your `bsconfig.json` dev dependencies:
 
 ## Basic Usage
 
-To create a task, use `Future.make`. It uses a `resolve` function similar to a promise (but no `reject`, however):
+To create a task, use `Future.make`. It provides a single `resolve` function, like a promise with no `reject`:
 
 ```js
 let futureGreeting = Future.make(resolve => resolve("hi"));
@@ -46,19 +46,19 @@ Future.make(resolve => resolve("hi"))
 |> Future.get(x => Js.log("Got value: " ++ x));
 ```
 
-`Future.get` only retrieves the future value. If you want to **transform** it to a *different* value, then you should use `Future.map`:
+`Future.get` only *retrieves* the future value. If you want to **transform** it to a *different* value, then you should use `Future.map`:
 
 ```js
-let futureNum = Future.value(99);
-/* Shortcut for: let futureNum = Future.make(resolve => resolve(99)); */
+/* Shortcut for: let future_A = Future.make(resolve => resolve(99)); */
+let future_A = Future.value(99);
 
-let secondFuture = futureNum |> Future.map(n => n + 1);
+let future_B = future_A |> Future.map(n => n + 1);
 
 
-futureNum
+future_A
 |> Future.get(n => Js.log(n)); /* logs: 99 */
 
-secondFuture
+future_B
 |> Future.get(n => Js.log(n)); /* logs: 100 */
 ```
 
