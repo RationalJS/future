@@ -76,7 +76,7 @@ let ft_b = futureNum |. Future.flatMap(n => Future.value(n + 20));
 
 ## API
 
-Core functions. **Note:** `_` represents the future itself as inserted by the `|.` operator.
+Core functions. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
 
 - `Future.make(resolver)` - Create a new, potentially-async future.
 - `Future.value(x)` - Create a new future with a plain value (synchronous).
@@ -87,7 +87,7 @@ Core functions. **Note:** `_` represents the future itself as inserted by the `|
 
 ### FutureResult
 
-Convenience functions when working with a future `Js.Result`. **Note:** `_` represents the future itself as inserted by the `|.` operator.
+Convenience functions when working with a future `Js.Result`. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
 
 - `FutureResult.mapOk(_,fn)` - Transform a future value into another value, but only if the value is a `Js.Result.Ok`. Similar to `Promise.prototype.then`
 - `FutureResult.mapError(_,fn)` - Transform a future value into another value, but only if the value is a `Js.Result.Error`. Similar to `Promise.prototype.catch`
