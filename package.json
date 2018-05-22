@@ -1,6 +1,6 @@
 {
   "name": "reason-future",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
@@ -19,12 +19,15 @@
   "license": "MIT",
   "devDependencies": {
     "bs-ospec": "^1.0.0",
-    "bs-platform": "^3.0.0",
+    "bs-platform": "^3.1.0",
     "ospec": "^1.4.1"
   },
   "description": "A Js.Promise alternative for ReasonML.",
   "main": "index.js",
   "dependencies": {},
+  "peerDependencies": {
+    "bs-platform": ">= 3.1.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rationaljs/future.git"

@@ -10,6 +10,8 @@ Compared to a promise, a future is:
 
 ## Installation
 
+First make sure you have bs-platform `>= 3.1.0`. Then install with npm:
+
 ```
 $ npm install --save reason-future
 ```
@@ -85,19 +87,20 @@ Core functions. **Note:** `_` represents the future itself as inserted by `|.` (
 - `Future.get(_,fn)` - Get the value of a future
 - `Future.tap(_,fn)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
 
-### FutureResult
+### Future Belt.Result
 
-Convenience functions when working with a future `Js.Result`. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
+Convenience functions when working with a future `Belt.Result`. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
 
-- `FutureResult.mapOk(_,fn)` - Transform a future value into another value, but only if the value is a `Js.Result.Ok`. Similar to `Promise.prototype.then`
-- `FutureResult.mapError(_,fn)` - Transform a future value into another value, but only if the value is a `Js.Result.Error`. Similar to `Promise.prototype.catch`
-- `FutureResult.flatMapOk(_,fn)` - Same as `mapOk` but flattens.
-- `FutureResult.flatMapError(_,fn)` - Same as `mapError` but flattens.
+- `Future.mapOk(_,fn)` - Transform a future value into another value, but only if the value is a `Belt.Result.Ok`. Similar to `Promise.prototype.then`
+- `Future.mapError(_,fn)` - Transform a future value into another value, but only if the value is a `Belt.Result.Error`. Similar to `Promise.prototype.catch`
+- `Future.tapOk(_,fn)` - Do something with the value of a future without changing it, but only if the value is a `Belt.Result.Ok`. Returns the same future. Convenience for side effects such as console logging.
+- `Future.tapError(_,fn)` - Same as `tapOk` but for `Belt.Result.Error`
 
 ## TODO
 
 - Implement cancellation tokens
 - Interop with `Js.Promise`
+- `flatMapOk` / `flatMapError` (with [composable error handling](http://keleshev.com/composable-error-handling-in-ocaml)?)
 
 ## Build
 ```
