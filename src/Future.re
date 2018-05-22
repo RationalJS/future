@@ -1,6 +1,6 @@
-type map_fun('a) = ('a => unit) => unit;
+type getFn('a) = ('a => unit) => unit;
 
-type t('a) = Future(map_fun('a));
+type t('a) = Future(getFn('a));
 
 let make = (resolver) => {
   let callbacks = ref([]);
