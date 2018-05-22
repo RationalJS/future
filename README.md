@@ -103,6 +103,7 @@ Convenience functions when working with a future `Belt.Result`. **Note:** `_` re
 - `flatMapOk` / `flatMapError` (with [composable error handling](http://keleshev.com/composable-error-handling-in-ocaml)?)
 
 ## Build
+
 ```
 npm run build
 ```
@@ -111,6 +112,12 @@ npm run build
 
 ```
 npm run start
+```
+
+## Test
+
+```
+npm test
 ```
 
 ## Editor
