@@ -9,7 +9,7 @@ let make = (resolver) => {
   resolver(result => switch(data^) {
     | None =>
       data := Some(result);
-      callbacks^ |. List.rev |. List.iter(cb => cb(result), _);
+      callbacks^ |. Belt.List.reverse |. Belt.List.forEach(cb => cb(result));
       /* Clean up memory usage */
       callbacks := []
     | Some(_) =>
