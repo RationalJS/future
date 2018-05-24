@@ -95,6 +95,27 @@ describe("Future", () => {
     );
   });
 
+  test("raising resolver", () => {
+    Future.make((_resolve, _reject) => raise(Err("one")))
+    |. Future.get(
+      _ => (),
+      e => {
+        e |. deepEquals(Err("one"));
+      }
+    )
+  });
+
+  test("raising callback", () => {
+    Future.value(59)
+    |. Future.map(_ => raise(Err("one")))
+    |. Future.get(
+      _ => (),
+      e => {
+        e |. deepEquals(Err("one"));
+      }
+    )
+  });
+
   test("multiple gets", () => {
     let count = ref(0);
     let future = Future.make((resolve, _reject) => {

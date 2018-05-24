@@ -9,28 +9,32 @@ let make = (resolver) => {
   let failureCallbacks = ref([]);
   let data = ref(None);
 
-  resolver(
-    result => switch(data^) {
-      | None =>
-        data := Some(Result.Ok(result));
-        successCallbacks^ |. List.reverse |. List.forEach(cb => cb(result));
-        /* Clean up memory usage */
-        successCallbacks := [];
-        failureCallbacks := []
-      | Some(_) =>
-        () /* Do nothing; theoretically not possible */
-    },
-    error => switch (data^) {
-      | None =>
-        data := Some(Result.Error(error));
-        failureCallbacks^ |. List.reverse |. List.forEach(cb => cb(error));
+  try (
+    resolver(
+      result => switch(data^) {
+        | None =>
+          data := Some(Result.Ok(result));
+          successCallbacks^ |. List.reverse |. List.forEach(cb => cb(result));
+          /* Clean up memory usage */
+          successCallbacks := [];
+          failureCallbacks := []
+        | Some(_) =>
+          () /* Do nothing; theoretically not possible */
+      },
+      error => switch (data^) {
+        | None =>
+          data := Some(Result.Error(error));
+          failureCallbacks^ |. List.reverse |. List.forEach(cb => cb(error));
 
-        successCallbacks := [];
-        failureCallbacks := []
-      | Some(_) =>
-        ()
-    }
-  );
+          successCallbacks := [];
+          failureCallbacks := []
+        | Some(_) =>
+          ()
+      }
+    )
+  ) {
+  | error => data := Some(Error(error))
+  };
 
   Future((resolve, reject) => switch(data^) {
     | Some(Ok(result)) => resolve(result)
