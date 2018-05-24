@@ -50,36 +50,47 @@ let value = (x) => make((resolve, _reject) => resolve(x));
 let error = (e) => make((_resolve, reject) => reject(e));
 
 
-let map = (Future(get), f) => make(resolve => {
-  get(result => resolve(f(result)))
-});
-
-let flatMap = (Future(get), f) => make((resolve, reject) => {
+let map = (Future(get), f) => make((resolve, reject) => {
   get(
-    result => {
-      let Future(get2) = f(result);
-      get2(resolve, reject)
+    result => switch(f(result)) {
+      | value => resolve(value)
+      | exception error => reject(error)
     },
     reject
   )
 });
 
-let tap = (Future(get) as future, f) => {
-  get(f, _error => ());
-  future
-};
+let flatMap = (Future(get), f) => make((resolve, reject) => {
+  get(
+    result => switch(f(result)) {
+      | Future(get2) => get2(resolve, reject)
+      | exception error => reject(error)
+    },
+    reject
+  )
+});
+
+let tap = (Future(get), f) => make((resolve, reject) => {
+  get(
+    result => switch (f(result)) {
+      | () => resolve(result)
+      | exception error => reject(error)
+    },
+    reject
+  )
+});
 
 let catch = (Future(get), f) => make((resolve, reject) => {
   get(
     resolve,
-    error => {
-      let Future(get2) = f(error);
-      get2(resolve, reject)
+    error => switch (f(error)) {
+      | Future(get2) => get2(resolve, reject)
+      | exception error => reject(error)
     }
   )
 });
 
-let get = (Future(getFn), f) => getFn(f);
+let get = (Future(getFn), resolve, reject) => getFn(resolve, reject);
 
 /* *
  * Future Belt.Result convenience functions,

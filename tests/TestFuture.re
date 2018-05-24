@@ -119,8 +119,8 @@ describe("Future", () => {
     )
   });
 
-  test("raising callback", () => {
-    Future.value(59)
+  testAsync("raising map", done_ => {
+    delay(20, () => 59)
     |. Future.map(_ => raise(Err("one")))
     |. Future.get(
       _ => {
@@ -128,6 +128,50 @@ describe("Future", () => {
       },
       e => {
         e |. deepEquals(Err("one"));
+        done_();
+      }
+    )
+  });
+
+  testAsync("raising flatMap", done_ => {
+    delay(20, () => 59)
+    |. Future.flatMap(_ => raise(Err("one")))
+    |. Future.get(
+      _ => {
+        1 |. equals(2);
+      },
+      e => {
+        e |. deepEquals(Err("one"));
+        done_();
+      }
+    )
+  });
+
+  testAsync("raising tap", done_ => {
+    delay(20, () => 59)
+    |. Future.tap(_ => raise(Err("one")))
+    |. Future.get(
+      _ => {
+        1 |. equals(2);
+      },
+      e => {
+        e |. deepEquals(Err("one"));
+        done_();
+      }
+    )
+  });
+
+  testAsync("raising catch", done_ => {
+    delay(20, () => 59)
+    |. Future.tap(_ => assert false)
+    |. Future.catch(_ => raise(Err("one")))
+    |. Future.get(
+      _ => {
+        1 |. equals(2);
+      },
+      e => {
+        e |. deepEquals(Err("one"));
+        done_();
       }
     )
   });
