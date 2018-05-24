@@ -1,45 +1,79 @@
-type getFn('a) = ('a => unit) => unit;
+type getFn('a) = ('a => unit, exn => unit) => unit;
 
 type t('a) = Future(getFn('a));
 
 let make = (resolver) => {
-  let callbacks = ref([]);
+  open Belt;
+
+  let successCallbacks = ref([]);
+  let failureCallbacks = ref([]);
   let data = ref(None);
 
-  resolver(result => switch(data^) {
-    | None =>
-      data := Some(result);
-      callbacks^ |. Belt.List.reverse |. Belt.List.forEach(cb => cb(result));
-      /* Clean up memory usage */
-      callbacks := []
-    | Some(_) =>
-      () /* Do nothing; theoretically not possible */
-  });
+  resolver(
+    result => switch(data^) {
+      | None =>
+        data := Some(Result.Ok(result));
+        successCallbacks^ |. List.reverse |. List.forEach(cb => cb(result));
+        /* Clean up memory usage */
+        successCallbacks := [];
+        failureCallbacks := []
+      | Some(_) =>
+        () /* Do nothing; theoretically not possible */
+    },
+    error => switch (data^) {
+      | None =>
+        data := Some(Result.Error(error));
+        failureCallbacks^ |. List.reverse |. List.forEach(cb => cb(error));
 
-  Future(resolve => switch(data^) {
-    | Some(result) => resolve(result)
-    | None => callbacks := [resolve, ...callbacks^]
+        successCallbacks := [];
+        failureCallbacks := []
+      | Some(_) =>
+        ()
+    }
+  );
+
+  Future((resolve, reject) => switch(data^) {
+    | Some(Ok(result)) => resolve(result)
+    | Some(Error(error)) => reject(error)
+    | None =>
+      successCallbacks := [resolve, ...successCallbacks^];
+      failureCallbacks := [reject, ...failureCallbacks^];
   })
 };
 
-let value = (x) => make(resolve => resolve(x));
+let value = (x) => make((resolve, _reject) => resolve(x));
+
+let error = (e) => make((_resolve, reject) => reject(e));
 
 
 let map = (Future(get), f) => make(resolve => {
   get(result => resolve(f(result)))
 });
 
-let flatMap = (Future(get), f) => make(resolve => {
-  get(result => {
-    let Future(get2) = f(result);
-    get2(resolve)
-  })
+let flatMap = (Future(get), f) => make((resolve, reject) => {
+  get(
+    result => {
+      let Future(get2) = f(result);
+      get2(resolve, reject)
+    },
+    reject
+  )
 });
 
 let tap = (Future(get) as future, f) => {
-  get(f);
+  get(f, _error => ());
   future
 };
+
+let catch = (Future(get), f) => make((resolve, reject) => {
+  get(
+    resolve,
+    error => {
+      let Future(get2) = f(error);
+      get2(resolve, reject)
+    }
+  )
+});
 
 let get = (Future(getFn), f) => getFn(f);
 
