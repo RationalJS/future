@@ -23,7 +23,9 @@ describe("Future", () => {
       s => {
         s |. equals("one!");
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     )
   });
 
@@ -34,7 +36,9 @@ describe("Future", () => {
       | _ => assert false
     })
     |. Future.get(
-      _ => (),
+      _ => {
+        1 |. equals(2);
+      },
       err => {
         err |. deepEquals(Err("one!"));
       }
@@ -50,7 +54,9 @@ describe("Future", () => {
         s |. equals("20!");
         done_();
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
@@ -61,7 +67,9 @@ describe("Future", () => {
       | _ => assert false
     })
     |. Future.get(
-      _ => (),
+      _ => {
+        1 |. equals(2);
+      },
       error => {
         error |. deepEquals(Err("20!"));
         done_();
@@ -80,7 +88,9 @@ describe("Future", () => {
         n |. equals(90);
         v^ |. equals(100);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
@@ -91,14 +101,18 @@ describe("Future", () => {
       n => {
         n |. equals(60);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
   test("raising resolver", () => {
     Future.make((_resolve, _reject) => raise(Err("one")))
     |. Future.get(
-      _ => (),
+      _ => {
+        1 |. equals(2);
+      },
       e => {
         e |. deepEquals(Err("one"));
       }
@@ -109,7 +123,9 @@ describe("Future", () => {
     Future.value(59)
     |. Future.map(_ => raise(Err("one")))
     |. Future.get(
-      _ => (),
+      _ => {
+        1 |. equals(2);
+      },
       e => {
         e |. deepEquals(Err("one"));
       }
@@ -128,7 +144,9 @@ describe("Future", () => {
       c => {
         c |. equals(1);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
     count^ |. equals(1);
 
@@ -136,7 +154,9 @@ describe("Future", () => {
       c => {
         c |. equals(1);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
     count^ |. equals(1);
   });
@@ -154,7 +174,9 @@ describe("Future", () => {
       _ => {
         count^ |. equals(~m="Runs after previous future", 1);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
     count^ |. equals(~m="Callback is async (2)", 0);
 
@@ -162,7 +184,9 @@ describe("Future", () => {
       _ => {
         count^ |. equals(~m="Previous future only runs once", 1);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
     count^ |. equals(0, ~m="Callback is async (3)");
 
@@ -182,7 +206,9 @@ describe("Future Belt.Result", () => {
       r => {
         Belt.Result.getExn(r) |. equals("two!");
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
 
     Belt.Result.Error("err2")
@@ -193,7 +219,9 @@ describe("Future Belt.Result", () => {
         | Ok(_) => raise(TestError("shouldn't be possible"))
         | Error(e) => e |. equals("err2");
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
@@ -205,7 +233,9 @@ describe("Future Belt.Result", () => {
       r => {
         Belt.Result.getExn(r) |. equals("three");
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
 
     Belt.Result.Error("err3")
@@ -216,7 +246,9 @@ describe("Future Belt.Result", () => {
         | Ok(_) => raise(TestError("shouldn't be possible"))
         | Error(e) => e |. equals("err3!");
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
@@ -231,7 +263,9 @@ describe("Future Belt.Result", () => {
       _ => {
         x^ |. equals(11);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
 
     Belt.Result.Error(10)
@@ -241,7 +275,9 @@ describe("Future Belt.Result", () => {
       _ => {
         y^ |. equals(1);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
@@ -256,7 +292,9 @@ describe("Future Belt.Result", () => {
       _ => {
         x^ |. equals(1);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
 
     Belt.Result.Error(10)
@@ -266,7 +304,9 @@ describe("Future Belt.Result", () => {
       _ => {
         y^ |. equals(11);
       },
-      _ => ()
+      _ => {
+        1 |. equals(2);
+      }
     );
   });
 
