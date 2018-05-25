@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/RationalJS/future.svg?branch=master)](https://travis-ci.org/RationalJS/future)
+
 # The Future is Now
 
 Future is a `Js.Promise` alternative. It is written in ReasonML.
