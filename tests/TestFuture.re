@@ -148,7 +148,7 @@ describe("Future Belt.Result", () => {
     |. Future.value
     |. Future.flatMapError(s => Belt.Result.Error(s ++ "!") |. Future.value)
     |. Future.get(r => Belt.Result.getExn(r) |. equals("five"));
-    
+
     Belt.Result.Error("err5")
     |. Future.value
     |. Future.flatMapError(e => Belt.Result.Error(e ++ "!") |. Future.value)

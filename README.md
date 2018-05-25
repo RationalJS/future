@@ -1,3 +1,4 @@
+[![npm](https://img.shields.io/npm/v/reason-future.svg)](https://www.npmjs.com/package/reason-future)
 [![Build Status](https://travis-ci.org/RationalJS/future.svg?branch=master)](https://travis-ci.org/RationalJS/future)
 
 # The Future is Now
@@ -89,51 +90,59 @@ Core functions. **Note:** `_` represents the future itself as inserted by `|.` (
 - `Future.get(_,fn)` - Get the value of a future
 - `Future.tap(_,fn)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
 
-### Future Belt.Result
+### Belt.Result
 
 Convenience functions when working with a future `Belt.Result`. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
 
-- `Future.mapOk(_,fn)` - Transform a future value into another value, but only if the value is a `Belt.Result.Ok`. Similar to `Promise.prototype.then`
-- `Future.mapError(_,fn)` - Transform a future value into another value, but only if the value is a `Belt.Result.Error`. Similar to `Promise.prototype.catch`
-- `Future.flatMapOk(_, fn)` - Transform a future of a `Belt.Result` into
-another `Belt.Result` given that the provided function `fn` also returns a
-`Future.t(Belt.Result.t('a, 'b))`.  `fn` is only called when the initial
-future resolves to `Belt.Result.Ok`.
-- `Future.flatMapError(_, fn)` - Transform a future of a `Belt.Result` into
-another `Future.t(Belt.Result.t)` given that `fn` also returns a
-`Future.t(Belt.Result.t)`.  `fn` is only called when the initial future
-resolves to `Belt.Result.Error`.
+**Note 2**: The terms `Result.Ok` and `Result.Error` in this context are expected to be read as `Belt.Result.Ok` and `Belt.Result.Error`.
+
+- `Future.mapOk(_,fn)` - Transform a future value into another value, but only if the value is an `Result.Ok`. Similar to `Promise.prototype.then`
+- `Future.mapError(_,fn)` - Transform a future value into another value, but only if the value is an `Result.Error`. Similar to `Promise.prototype.catch`
 - `Future.tapOk(_,fn)` - Do something with the value of a future without changing it, but only if the value is a `Belt.Result.Ok`. Returns the same future. Convenience for side effects such as console logging.
-- `Future.tapError(_,fn)` - Same as `tapOk` but for `Belt.Result.Error`
+- `Future.tapError(_,fn)` - Same as `tapOk` but for `Result.Error`
+
+The following are more situational:
+
+- `Future.flatMapOk(_, fn)` - Transform a future `Result.Ok` into
+a future `Result`. Flattens the inner future.
+- `Future.flatMapError(_, fn)` - Transform a future `Result.Error` into
+a future `Result`. Flattens the inner future.
 
 ### FutureJs
 
-Convenience functions for interop with the `Js` land.
+Convenience functions for interop with JavaScript land.
 
 - `FutureJs.fromPromise(promise, errorTransformer)`
-  - `promise` is the `Js.Promise.t('a`) that will be transformed into a 
+  - `promise` is the `Js.Promise.t('a)` that will be transformed into a
     `Future`
   - `errorTransformer` allows you to determine how `Js.Promise.error`
     objects will be transformed before they are returned wrapped within
     a `Belt.Result.Error`.  This allows you to implement the error handling
-    method which best meets your application's needs. 
-    [Composible Error Handling in OCaml][error-handling] provides several
-    strategies that you may employ.
-    Here is a trivial `errorTransformer` implementation:
-    ```reason
-    let errorTransformer = Js.String.make;
-    ```
-    This will translate your error into a string similar to this example
-    found in `tests/TestFutureJs.re`:
-    > TestFutureJs.TestError,2,oops!
+    method which best meets your application's needs.
 
-Return a future of the given promise.
+Example use:
+
+
+```js
+/*
+  This error handler is super simple; you will probably want
+  to write something more sophisticated in your app.
+*/
+let handleError = Js.String.make;
+
+somePromiseGetter()
+|. FutureJs.fromPromise(handleError)
+|. Future.map(value => Js.log2("It worked!", value))
+|. Future.mapError(err => Js.log2("uh on", err));
+```
+
+See [Composible Error Handling in OCaml][error-handling] for several strategies that you may employ.
 
 ## TODO
 
 - [ ] Implement cancellation tokens
 - [x] Interop with `Js.Promise`
-- [x] `flatMapOk` / `flatMapError` (with [composable error handling](http://keleshev.com/composable-error-handling-in-ocaml)?)
+- [x] `flatMapOk` / `flatMapError` (with [composable error handling](http://keleshev.com/composable-error-handling-in-ocaml))
 
 ## Build
 

@@ -1,7 +1,7 @@
 
 /**
  * Translate a Js.Promise to a Future(Belt.Result.t)
- * 
+ *
  * errorTransformer: (Js.Promise.error) => 'a
  * - The errorTransformer will provide you with the raw Js.Promise.error
  *   object.  This is done so that you may decide on the appropriate error
@@ -11,10 +11,10 @@
  *   ```reason
  *   let errorTransformer = (error) =>
  *     Js.String.make(error)
- *     |> (str => /*... do your transforms here */ str);
+ *     |. (str => /*... do your transforms here */ str);
 *    ```
  */
-let fromPromise = (promise, errorTransformer) => 
+let fromPromise = (promise, errorTransformer) =>
   Future.make((callback) =>
     promise
     |> Js.Promise.then_(res =>
