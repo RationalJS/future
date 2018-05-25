@@ -128,6 +128,36 @@ describe("Future Belt.Result", () => {
     });
   });
 
+  test("flatMapOk", () => {
+    Belt.Result.Ok("four")
+    |. Future.value
+    |. Future.flatMapOk(s => Belt.Result.Ok(s ++ "!") |. Future.value)
+    |. Future.get(r => Belt.Result.getExn(r) |. equals("four!"));
+
+    Belt.Result.Error("err4")
+    |. Future.value
+    |. Future.flatMapError(e => Belt.Result.Error(e ++ "!") |. Future.value)
+    |. Future.get(r => switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(e) => e |. equals("err4!");
+    });
+  });
+
+  test("flatMapError", () => {
+    Belt.Result.Ok("five")
+    |. Future.value
+    |. Future.flatMapError(s => Belt.Result.Error(s ++ "!") |. Future.value)
+    |. Future.get(r => Belt.Result.getExn(r) |. equals("five"));
+    
+    Belt.Result.Error("err5")
+    |. Future.value
+    |. Future.flatMapError(e => Belt.Result.Error(e ++ "!") |. Future.value)
+    |. Future.get(r => switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(e) => e |. equals("err5!");
+    });
+  });
+
   test("tapOk", () => {
     let x = ref(1);
     let y = ref(1);

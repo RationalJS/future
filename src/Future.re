@@ -54,6 +54,17 @@ let mapError = (future, f) => future |. map(r => switch(r) {
   | Ok(a) => Belt.Result.Ok(a)
 });
 
+let flatMapOk = (future, f) => future |. flatMap(r =>
+  switch(r) {
+  | Belt.Result.Ok(v) => f(v)
+  | Belt.Result.Error(e) => value(Belt.Result.Error(e))
+  });
+
+let flatMapError = (future, f) => future |. flatMap(r =>
+  switch(r) {
+  | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
+  | Belt.Result.Error(e) => f(e)
+  });
 
 let tapOk = (future, f) => future |. tap(r => switch(r) {
   | Belt.Result.Ok(v) => f(v) |. ignore
