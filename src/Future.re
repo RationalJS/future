@@ -75,3 +75,41 @@ let tapError = (future, f) => future |. tap(r => switch(r) {
   | Belt.Result.Error(v) => f(v) |. ignore
   | Ok(_) => ()
 });
+
+let flatMapArray = (xs: array('a), f: 'a => t('b), maxConcurrent) =>
+  make(resolve => {
+    /* TODO how can i create array of a generic type?
+     * chenglou recommends Belt.Array.makeUninitialized
+     * octachron recommends array(option('a))
+     * i'm gonna use hax because i'm dumb and i want things to go wrong for me
+     * fun fact: Belt.Array.makeUninitialized initializes the array to Js.null!
+     */
+    let result: array('b) =
+      xs |. Array.length |. Belt.Array.makeUninitialized |. Obj.magic;
+    let xlen = Array.length(xs);
+    let numJobs = ref(0);
+    let cursor = ref(0);
+    let rec pump = () => {
+      if (cursor^ == xlen) {
+        if (numJobs^ == 0) {
+          resolve(result);
+        };
+      } else {
+        let i = cursor^;
+        cursor := cursor^ + 1;
+        numJobs := numJobs^ + 1;
+        xs[i]
+        |. f
+        |. get(x => {
+             result[i] = x;
+             numJobs := numJobs^ - 1;
+             pump();
+           });
+      };
+      ();
+    };
+    for (i in 1 to min(maxConcurrent, xlen)) {
+      pump();
+    };
+    ();
+  });
