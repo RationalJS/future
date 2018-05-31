@@ -5,7 +5,7 @@
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
     "clean": "bsb -clean-world",
-    "coverage:report": "nyc --reporter=text-lcov ospec",
+    "coverage:report": "nyc --reporter=text-lcov ospec | coveralls",
     "posttest": "npm run coverage:report",
     "test": "yarn clean ; yarn build ; istanbul cover --print both ospec",
     "test:only": "ospec",
