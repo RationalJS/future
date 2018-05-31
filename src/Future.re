@@ -108,7 +108,7 @@ let flatMapArray = (xs: array('a), f: 'a => t('b), maxConcurrent) =>
       };
       ();
     };
-    for (i in 1 to min(maxConcurrent, xlen)) {
+    for (_ in 1 to min(maxConcurrent, xlen)) {
       pump();
     };
     ();
