@@ -1,0 +1,130 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>Future</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      
+      <div class='docs-listing'><a href="../index.html">Home</a></div>
+      <div class='toc-header'>Page Contents</div>
+      <div class='table-of-contents'>
+      <a href="#Future" class='level-1 header'>Future</a>
+<a href="#type-getFn" class='level-2 type'>getFn</a>
+<a href="#type-t" class='level-2 type'>t</a>
+<a href="#value-make" class='level-2 value'>make</a>
+<a href="#value-value" class='level-2 value'>value</a>
+<a href="#value-map" class='level-2 value'>map</a>
+<a href="#value-flatMap" class='level-2 value'>flatMap</a>
+<a href="#value-tap" class='level-2 value'>tap</a>
+<a href="#value-get" class='level-2 value'>get</a>
+<a href="#value-mapOk" class='level-2 value'>mapOk</a>
+<a href="#value-mapError" class='level-2 value'>mapError</a>
+<a href="#value-flatMapOk" class='level-2 value'>flatMapOk</a>
+<a href="#value-flatMapError" class='level-2 value'>flatMapError</a>
+<a href="#value-tapOk" class='level-2 value'>tapOk</a>
+<a href="#value-tapError" class='level-2 value'>tapError</a>
+      </div>
+      <div class='project-title'>Package modules</div><div class='project-listing'><a href="Future.html">Future</a>
+<a href="FutureJs.html">FutureJs</a>
+<a href="FutureResult.html">FutureResult</a>
+<a href="Future.html">Future</a>
+<a href="FutureJs.html">FutureJs</a>
+<a href="FutureResult.html">FutureResult</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/rationaljs/future/blob/master/src/Future.re" class="edit-link">Edit</a>
+    <a href="#Future" id="Future"><h1>Future</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item'>type <a href="#type-getFn" id="type-getFn">getFn</a>('a) = 'a => unit => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-t" id="type-t">t</a>('a) = | Future(<a href="#type-getFn">getFn</a>('a))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-make" id="value-make">make</a>: 'a => unit => 'a => <a href="#type-t">t</a>('a)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-value" id="value-value">value</a>: 'a => <a href="#type-t">t</a>('a)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-map" id="value-map">map</a>: (<a href="#type-t">t</a>('a), 'a => 'a) => <a href="#type-t">t</a>('a)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-flatMap" id="value-flatMap">flatMap</a>: (<a href="#type-t">t</a>('a), 'a => <a href="#type-t">t</a>('a)) => <a href="#type-t">t</a>('a)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-tap" id="value-tap">tap</a>: (<a href="#type-t">t</a>('a), 'a => unit) => <a href="#type-t">t</a>('a)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-get" id="value-get">get</a>: (<a href="#type-t">t</a>('a), 'a => unit) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-mapOk" id="value-mapOk">mapOk</a>: (<a href="#type-t">t</a>(Belt.Result.t('a, 'a)), 'a => 'a) => <a href="#type-t">t</a>(
+  Belt.Result.t('a, 'a)
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-mapError" id="value-mapError">mapError</a>: (<a href="#type-t">t</a>(Belt.Result.t('a, 'a)), 'a => 'a) => <a href="#type-t">t</a>(
+  Belt.Result.t('a, 'a)
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-flatMapOk" id="value-flatMapOk">flatMapOk</a>: (
+  <a href="#type-t">t</a>(Belt.Result.t('a, 'a)),
+  'a => <a href="#type-t">t</a>(Belt.Result.t('a, 'a))
+) => <a href="#type-t">t</a>(Belt.Result.t('a, 'a))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-flatMapError" id="value-flatMapError">flatMapError</a>: (
+  <a href="#type-t">t</a>(Belt.Result.t('a, 'a)),
+  'a => <a href="#type-t">t</a>(Belt.Result.t('a, 'a))
+) => <a href="#type-t">t</a>(Belt.Result.t('a, 'a))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-tapOk" id="value-tapOk">tapOk</a>: (<a href="#type-t">t</a>(Belt.Result.t('a, 'a)), 'a => 'a) => <a href="#type-t">t</a>(
+  Belt.Result.t('a, 'a)
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-tapError" id="value-tapError">tapError</a>: (<a href="#type-t">t</a>(Belt.Result.t('a, 'a)), 'a => 'a) => <a href="#type-t">t</a>(
+  Belt.Result.t('a, 'a)
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

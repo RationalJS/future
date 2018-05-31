@@ -1,0 +1,56 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>FutureJs</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      
+      <div class='docs-listing'><a href="../index.html">Home</a></div>
+      <div class='toc-header'>Page Contents</div>
+      <div class='table-of-contents'>
+      <a href="#FutureJs" class='level-1 header'>FutureJs</a>
+<a href="#value-fromPromise" class='level-2 value'>fromPromise</a>
+      </div>
+      <div class='project-title'>Package modules</div><div class='project-listing'><a href="Future.html">Future</a>
+<a href="FutureJs.html">FutureJs</a>
+<a href="FutureResult.html">FutureResult</a>
+<a href="Future.html">Future</a>
+<a href="FutureJs.html">FutureJs</a>
+<a href="FutureResult.html">FutureResult</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    <a href="https://github.com/rationaljs/future/blob/master/src/FutureJs.re" class="edit-link">Edit</a>
+    <a href="#FutureJs" id="FutureJs"><h1>FutureJs</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item'>let <a href="#value-fromPromise" id="value-fromPromise">fromPromise</a>: (
+  Js.Promise.t('a),
+  Js.Promise.error => 'a
+) => <a href="Future.html">Future</a>.<a href="Future.html#type-t">t</a>(Belt.Result.t('a, 'a))</h4>
+
+<div class='body '><ul><li>Translate a Js.Promise to a Future(Belt.Result.t)
+ *</li><li>errorTransformer: (Js.Promise.error) =&gt; &#39;a</li><li><ul><li>The errorTransformer will provide you with the raw Js.Promise.error</li></ul></li><li>object.  This is done so that you may decide on the appropriate error</li><li>handling scheme for your application.</li><li>See: http://keleshev.com/composable-error-handling-in-ocaml</li><li><ul><li>A good start is translating the Js.Promise.error to a string.</li></ul></li><li>```reason</li><li>let errorTransformer = (error) =&gt;</li><li>Js.String.make(error)</li><li>|. (str =&gt; /*... do your transforms here */ str);</li></ul><ul><li>```
+</li></ul></div></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

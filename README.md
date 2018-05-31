@@ -21,7 +21,7 @@ $ npm install --save reason-future
 
 Then add `"reason-future"` to your `bsconfig.json` dev dependencies:
 
-```
+```json
 {
   ...
   "bs-dependencies": [
@@ -34,13 +34,13 @@ Then add `"reason-future"` to your `bsconfig.json` dev dependencies:
 
 To create a task, use `Future.make`. It provides a single `resolve` function, like a promise with no `reject`:
 
-```js
+```reason
 let futureGreeting = Future.make(resolve => resolve("hi"));
 ```
 
 To get the value of a future, use `Future.get`:
 
-```js
+```reason
 let futureGreeting = Future.make(resolve => resolve("hi"));
 futureGreeting
 |. Future.get(x => Js.log("Got value: " ++ x));
@@ -53,7 +53,7 @@ Future.make(resolve => resolve("hi"))
 
 `Future.get` only *retrieves* the future value. If you want to **transform** it to a *different* value, then you should use `Future.map`:
 
-```js
+```reason
 /* Shortcut for: let future_A = Future.make(resolve => resolve(99)); */
 let future_A = Future.value(99);
 
@@ -69,7 +69,7 @@ future_B
 
 And finally, if you `map` a future and return **another** future, you probably want to `flatMap` instead:
 
-```js
+```reason
 let futureNum = Future.value(50);
 
 let ft_a = futureNum |. Future.map(n => Future.value(n + 10));
@@ -123,16 +123,16 @@ Convenience functions for interop with JavaScript land.
 Example use:
 
 
-```js
+```reason
 /*
   This error handler is super simple; you will probably want
   to write something more sophisticated in your app.
 */
 let handleError = Js.String.make;
 
-somePromiseGetter()
+Js.Promise.resolve("some value")
 |. FutureJs.fromPromise(handleError)
-|. Future.map(value => Js.log2("It worked!", value))
+|. Future.mapOk(value => Js.log2("It worked!", value))
 |. Future.mapError(err => Js.log2("uh on", err));
 ```
 
@@ -146,19 +146,19 @@ See [Composible Error Handling in OCaml][error-handling] for several strategies 
 
 ## Build
 
-```
+```sh
 npm run build
 ```
 
 ## Build + Watch
 
-```
+```sh
 npm run start
 ```
 
 ## Test
 
-```
+```sh
 npm test
 ```
 
