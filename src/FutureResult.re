@@ -1,5 +1,5 @@
 let deprecate = (ft, name, more) =>
-  ft |. Future.tap(_ => Js.Console.warn("FutureResult."++name++" is deprecated." ++ more))
+  ft |. Future.tap(_ => Js.Console.warn("FutureResult."++name++" is deprecated." ++ more));
 
 let mapOk = (future, f) => future |. Future.map(r => switch(r) {
   | Js.Result.Ok(v) => f(v)
