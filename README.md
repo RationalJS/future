@@ -1,5 +1,6 @@
 [![npm](https://img.shields.io/npm/v/reason-future.svg)](https://www.npmjs.com/package/reason-future)
 [![Build Status](https://travis-ci.org/RationalJS/future.svg?branch=master)](https://travis-ci.org/RationalJS/future)
+[![Coverage Status](https://coveralls.io/repos/github/RationalJS/future/badge.svg?branch=test-coverage)](https://coveralls.io/github/RationalJS/future?branch=test-coverage)
 
 # The Future is Now
 

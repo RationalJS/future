@@ -134,6 +134,14 @@ describe("Future Belt.Result", () => {
     |. Future.flatMapOk(s => Belt.Result.Ok(s ++ "!") |. Future.value)
     |. Future.get(r => Belt.Result.getExn(r) |. equals("four!"));
 
+    Belt.Result.Error("err4.1")
+    |. Future.value
+    |. Future.flatMapOk(s => Belt.Result.Ok(s ++ "!") |. Future.value)
+    |. Future.get(r => switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(e) => e |. equals("err4.1");
+    });
+
     Belt.Result.Error("err4")
     |. Future.value
     |. Future.flatMapError(e => Belt.Result.Error(e ++ "!") |. Future.value)
