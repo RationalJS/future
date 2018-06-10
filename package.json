@@ -11,6 +11,11 @@
     "test:only": "ospec",
     "test:cover": "yarn clean ; yarn build ; istanbul cover --print both ospec"
   },
+  "nyc": {
+    "exclude": [
+      "tests"
+    ]
+  },
   "files": [
     "src/Future.re",
     "src/FutureResult.re",
