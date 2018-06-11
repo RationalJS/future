@@ -96,5 +96,27 @@ describe("FutureJs", () => {
 
       done_();
     });
-  })
+  });
+
+  testAsync("fromPromise (exception in callback)", done_ => {
+
+    let expected = "TestFutureJs.TestError,2,confused!";
+    let nodeFn = (callback) => callback(TestError("confused!"));
+    let promise = Js.Promise.make((~resolve as _, ~reject) => {
+      nodeFn((err) => reject(. err));
+    });
+    let future = () => FutureJs.fromPromise(promise, errorTransformer);
+    
+    Future.value(Belt.Result.Ok("ignored"))
+    |. Future.tap(_ => Js.log("huh? - 1"))
+    |. Future.mapOk(_ => raise(TestError("oh the noes!")))
+    |. Future.tap(_ => Js.log("huh? - 2"))
+    |. Future.get(r => {
+      switch(r) {
+      | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
+      | Belt.Result.Error((s)) => s |. equals(expected)
+      };
+      done_();
+    });
+  });
 });

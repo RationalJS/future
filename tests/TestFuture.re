@@ -4,11 +4,11 @@ exception TestError(string);
 type timeoutId;
 [@bs.val] [@bs.val] external setTimeout : ([@bs.uncurry] (unit => unit), int) => timeoutId = "";
 
-describe("Future", () => {
+let delay = (ms, f) => Future.make(resolve =>
+  setTimeout(() => f() |> resolve, ms) |> ignore
+);
 
-  let delay = (ms, f) => Future.make(resolve =>
-    setTimeout(() => f() |> resolve, ms) |> ignore
-  );
+describe("Future", () => {
 
   test("sync chaining", () => {
     Future.value("one")
@@ -110,8 +110,8 @@ describe("Future Belt.Result", () => {
       | Error(e) => e |. equals("err2");
     });
   });
-
-  test("mapOk", () => {
+/*
+  test("mapOk (sync exception)", () => {
     Belt.Result.Ok("ignored")
     |. Future.value
     |. Future.mapOk(_ => raise(TestError("boom, goes the dynamite!")))
@@ -121,6 +121,26 @@ describe("Future Belt.Result", () => {
       | Error(e) => raise(TestError(Js.String.make @@ e))
     })
   });
+  */
+/*
+  testAsync("mapOk (async exception)", done_ => {
+    delay(25, () => Belt.Result.Ok("ignored"))
+    |. Future.tap(_ => Js.log("mapOk-async-exception-1"))
+    |. Future.mapOk(_ => raise(TestError("boom, goes the dynamite!")))
+    |. Future.tap(_ => Js.log("mapOk-async-exception-2"))
+    |. Future.get(r => {
+      Js.log("mapOk-async-exception-3");
+      switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"));
+      | Error(TestError(s)) =>
+        Js.log("mapOk-async-exception-4");
+        s |. equals("boom, goes the dynamite!");
+        done_();
+      | Error(e) => raise(TestError(Js.String.make @@ e));
+      }
+    })
+  });
+  */
 
   test("mapError", () => {
     Belt.Result.Ok("three")
