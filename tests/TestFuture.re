@@ -111,6 +111,17 @@ describe("Future Belt.Result", () => {
     });
   });
 
+  test("mapOk", () => {
+    Belt.Result.Ok("ignored")
+    |. Future.value
+    |. Future.mapOk(_ => raise(TestError("boom, goes the dynamite!")))
+    |. Future.get(r => switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(TestError(s)) => s |. equals("boom, goes the dynamite!")
+      | Error(e) => raise(TestError(Js.String.make @@ e))
+    })
+  });
+
   test("mapError", () => {
     Belt.Result.Ok("three")
     |. Future.value
