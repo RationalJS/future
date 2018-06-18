@@ -78,12 +78,39 @@ let tapError = (future, f) => future |. tap(r => switch(r) {
 
 let flatMapArray = (xs: array('a), f: 'a => t('b), maxConcurrent) =>
   make(resolve => {
-    /* TODO how can i create array of a generic type?
-     * chenglou recommends Belt.Array.makeUninitialized
-     * octachron recommends array(option('a))
-     * i'm gonna use hax because i'm dumb and i want things to go wrong for me
-     * fun fact: Belt.Array.makeUninitialized initializes the array to Js.null!
-     */
+    let result: array(option('b)) =
+      xs |. Array.length |. Belt.Array.make(None);
+    let xlen = Array.length(xs);
+    let numJobs = ref(0);
+    let cursor = ref(0);
+    let rec pump = () => {
+      if (cursor^ == xlen) {
+        if (numJobs^ == 0) {
+          result |> Array.map(Belt.Option.getExn) |. resolve;
+        };
+      } else {
+        let i = cursor^;
+        cursor := cursor^ + 1;
+        numJobs := numJobs^ + 1;
+        xs[i]
+        |. f
+        |. get(x => {
+             result[i] = Some(x);
+             numJobs := numJobs^ - 1;
+             pump();
+           });
+      };
+      ();
+    };
+    for (_ in 1 to min(maxConcurrent, xlen)) {
+      pump();
+    };
+    ();
+  });
+
+/** like flatMapArray, but uses static type casts to avoid extra allocations */
+let flatMapArrayUnsafe = (xs: array('a), f: 'a => t('b), maxConcurrent) =>
+  make(resolve => {
     let result: array('b) =
       xs |. Array.length |. Belt.Array.makeUninitialized |. Obj.magic;
     let xlen = Array.length(xs);
