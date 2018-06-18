@@ -140,3 +140,9 @@ let flatMapArrayUnsafe = (xs: array('a), f: 'a => t('b), maxConcurrent) =>
     };
     ();
   });
+
+/** like flatMapArray, but with maxConcurrent=Js.Int.max */
+let allArray = (xs, f) => flatMapArray(xs, f, Js.Int.max);
+
+/** like flatMapArrayUnsafe, but with maxConcurrent=Js.Int.max */
+let allArrayUnsafe = (xs, f) => flatMapArrayUnsafe(xs, f, Js.Int.max);
