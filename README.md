@@ -90,6 +90,7 @@ Core functions. **Note:** `_` represents the future itself as inserted by `|.` (
 - `Future.flatMap(_,fn)` - Transform a future value into another future value
 - `Future.get(_,fn)` - Get the value of a future
 - `Future.tap(_,fn)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
+- `Future.all(_,fn)` - Turn a list of futures into a future of a list.  Used when you want to wait for a collection of futures to complete before doing something (equivalent to Promise.all in Javascript).
 
 ### Belt.Result
 

@@ -47,6 +47,13 @@ let tap = (Future(get) as future, f) => {
 
 let get = (Future(getFn), f) => getFn(f);
 
+let all = (fs: list(t('a))): t(list('a)) =>
+  fs->Belt.List.reduce(value([]), (accFuture, future) =>
+    future->flatMap(value =>
+      accFuture->map(xs => xs->Belt.List.concat([value]))
+    )
+  );
+
 /* *
  * Future Belt.Result convenience functions,
  * for working with a type Future.t( Belt.Result.t('a,'b) )

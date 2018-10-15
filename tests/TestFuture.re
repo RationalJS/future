@@ -85,6 +85,19 @@ describe("Future", () => {
 
     future->(Future.get(_ => done_()));
   });
+
+  testAsync("all (async)", done_ => {
+    let future =
+      Future.all([Future.value(1), delay(25, () => 2), delay(50, () => 3)]);
+
+    future->Future.get(result => {
+      /* Not sure how to get this assertion library to respect immutable lists, so just do this */
+      if (result != [1, 2, 3]) {
+        raise(TestError("Expected [1, 2, 3]"));
+      };
+      done_();
+    });
+  });
 });
 
 describe("Future Belt.Result", () => {
