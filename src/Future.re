@@ -36,6 +36,18 @@ let flatMap = (Future(get), f) => make(resolve => {
   })
 });
 
+let map2 = (fa, fb, f) =>
+  flatMap(fa, a => map(fb, b => f(a, b)));
+
+let map3 = (fa, fb, fc, f) =>
+  map2(map2(fa, fb, f), fc, v => v);
+
+let map4 = (fa, fb, fc, fd, f) =>
+  map3(map2(fa, fb, f), fc, fd, v => v);
+
+let map5 = (fa, fb, fc, fd, fe, f) =>
+  map4(map2(fa, fb, f), fc, fd, fe, v => v);
+
 let tap = (Future(get) as future, f) => {
   get(f);
   future
@@ -65,6 +77,18 @@ let flatMapError = (future, f) => future |. flatMap(r =>
   | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
   | Belt.Result.Error(e) => f(e)
   });
+
+let mapOk2 = (fa, fb, f) =>
+  flatMapOk(fa, a => mapOk(fb, b => f(a, b)));
+
+let mapOk3 = (fa, fb, fc, f) =>
+  mapOk2(mapOk2(fa, fb, f), fc, v => v);
+
+let mapOk4 = (fa, fb, fc, fd, f) =>
+  mapOk3(mapOk2(fa, fb, f), fc, fd, v => v);
+
+let mapOk5 = (fa, fb, fc, fd, fe, f) =>
+  mapOk4(mapOk2(fa, fb, f), fc, fd, fe, v => v);
 
 let tapOk = (future, f) => future |. tap(r => switch(r) {
   | Belt.Result.Ok(v) => f(v) |. ignore

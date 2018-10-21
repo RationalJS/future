@@ -4,11 +4,11 @@ exception TestError(string);
 type timeoutId;
 [@bs.val] [@bs.val] external setTimeout : ([@bs.uncurry] (unit => unit), int) => timeoutId = "";
 
-describe("Future", () => {
+let delay = (ms, f) => Future.make(resolve =>
+  setTimeout(() => f() |> resolve, ms) |> ignore
+);
 
-  let delay = (ms, f) => Future.make(resolve =>
-    setTimeout(() => f() |> resolve, ms) |> ignore
-  );
+describe("Future", () => {
 
   test("sync chaining", () => {
     Future.value("one")
@@ -45,6 +45,38 @@ describe("Future", () => {
     |. Future.flatMap(n => Future.value(n + 1))
     |. Future.get(n => {
       n |. equals(60);
+    });
+  });
+
+  testAsync("map2", done_ => {
+    Future.map2(
+      delay(20, () => 1),
+      Future.value("a"),
+      (num, str) => (num, str)
+    )
+    |. Future.get(tup => {
+      fst(tup) |. equals(1);
+      snd(tup) |. equals("a");
+      done_();
+    });
+  });
+
+  testAsync("map5", done_ => {
+    Future.map5(
+      delay(20, () => 0),
+      delay(40, () => 1.2),
+      delay(60, () => "foo"),
+      delay(80, () => []),
+      delay(100, () => ()),
+      (a, b, c, d, e) => (a, b, c, d, e)
+    )
+    |. Future.get(((a, b, c, d, e)) => {
+      a |. equals(0);
+      b |. equals(1.2);
+      c |. equals("foo");
+      d |. equals([]);
+      e |. equals(());
+      done_();
     });
   });
 
@@ -163,6 +195,39 @@ describe("Future Belt.Result", () => {
     |. Future.get(r => switch (r) {
       | Ok(_) => raise(TestError("shouldn't be possible"))
       | Error(e) => e |. equals("err5!");
+    });
+  });
+
+  test("mapOk5 success", () => {
+    Future.mapOk5(
+      Future.value(Belt.Result.Ok(0)),
+      Future.value(Belt.Result.Ok(1.1)),
+      Future.value(Belt.Result.Ok("")),
+      Future.value(Belt.Result.Ok([])),
+      Future.value(Belt.Result.Ok(Some("x"))),
+      (a, b, c, d, e) => (a, b, c, d, e)
+    )
+    |. Future.get(r => switch (r) {
+      | Ok(tup) => tup |. deepEquals((0, 1.1, "", [], Some("x")))
+      | Error(_) => raise(TestError("shouldn't be possible"))
+    });
+  });
+
+  testAsync("mapOk5 fails on first error", done_ => {
+    Future.mapOk5(
+      Future.value(Belt.Result.Ok(0)),
+      delay(20, () => Belt.Result.Ok(1.)),
+      delay(10, () => Belt.Result.Error("first")),
+      Future.value(Belt.Result.Ok("")),
+      delay(100, () => Belt.Result.Error("second")),
+      (_, _, _, _, _) => None
+    )
+    |. Future.get(r => {
+      switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(x) => x |. equals("first");
+      };
+      done_();
     });
   });
 
