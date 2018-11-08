@@ -1,8 +1,15 @@
 open BsOspec.Cjs;
 exception TestError(string);
 
+type timeoutId;
+[@bs.val] [@bs.val] external setTimeout : ([@bs.uncurry] (unit => unit), int) => timeoutId = "";
+
 describe("FutureJs", () => {
   let errorTransformer = x => x;
+
+  let delay = (ms, f) => Future.make(resolve =>
+    setTimeout(() => f() |> resolve, ms) |> ignore
+  );
 
   testAsync("fromPromise (resolved)", done_ => {
     Js.Promise.resolve(42)
@@ -96,5 +103,44 @@ describe("FutureJs", () => {
 
       done_();
     });
-  })
+  });
+
+  let checkPromisedValue = (done_, expected, actual) => {
+    equals(expected, actual);
+    done_();
+    Js.Promise.resolve(());
+  };
+
+  testAsync("toPromise (trivial Ok result)", done_ => {
+    Future.value(Belt.Result.Ok("payload"))
+    |> FutureJs.toPromise
+    |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.then_(checkPromisedValue(done_, "payload"));
+  });
+
+  testAsync("toPromise (trivial Error result)", done_ => {
+    let err = TestError("error!");
+
+    Future.value(Belt.Result.Error(err))
+    |> FutureJs.toPromise
+    |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.catch(checkPromisedValue(done_, err));
+  });
+
+  testAsync("toPromise (Ok result from delayed future)", done_ => {
+    delay(5, () => Belt.Result.Ok("payload"))
+    |> FutureJs.toPromise
+    |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.then_(checkPromisedValue(done_, "payload"));
+  });
+
+  testAsync("toPromise (Error result from delayed future)", done_ => {
+    let err = TestError("error!");
+
+    delay(5, () => Belt.Result.Error(err))
+    |> FutureJs.toPromise
+    |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.catch(checkPromisedValue(done_, err));
+  });
+
 });
