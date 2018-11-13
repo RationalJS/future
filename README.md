@@ -10,7 +10,7 @@ Compared to a promise, a future is:
 
 - **Lighter weight** – Only ~25 lines of implementation.
 - **Simpler** – Futures only resolve to a single type (as opposed to resolve and reject types), giving you more flexibility on your error handling.
-- **More rubust** – Futures have sound typing (unlike JS promises).
+- **More robust** – Futures have sound typing (unlike JS promises).
 
 ## Installation
 
