@@ -33,6 +33,12 @@ let fromPromise = (promise, errorTransformer) =>
   );
 
 let toPromise = (future) =>
+  Js.Promise.make((~resolve, ~reject as _) =>
+    future
+    |. Future.get(value => resolve(. value))
+  );
+
+let resultToPromise = (future) =>
   Js.Promise.make((~resolve, ~reject) =>
     future
     |. Future.map(result => switch(result) {

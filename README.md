@@ -121,8 +121,11 @@ Convenience functions for interop with JavaScript land.
     a `Belt.Result.Error`.  This allows you to implement the error handling
     method which best meets your application's needs.
 - `FutureJs.toPromise(future)`
-  - `future` is the `Future.t(Belt.Result('a, 'e))` that is transformed into a
-    `Js.Promise.t('a)`
+  - `future` is any `Future.t('a)` which is transformed into a
+    `Js.Promise.t('a)`. Always resolves, never rejects the promise.
+- `FutureJs.resultToPromise(future)`
+  - `future` is the `Future.t(Belt.Result('a, 'e))` which is transformed into a
+    `Js.Promise.t('a)`. Resolves the promise on Ok result and rejects on Error result.
 
 Example use:
 
