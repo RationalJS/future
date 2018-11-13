@@ -1,15 +1,8 @@
 open BsOspec.Cjs;
-exception TestError(string);
-
-type timeoutId;
-[@bs.val] [@bs.val] external setTimeout : ([@bs.uncurry] (unit => unit), int) => timeoutId = "";
+open TestUtil;
 
 describe("FutureJs", () => {
   let errorTransformer = x => x;
-
-  let delay = (ms, f) => Future.make(resolve =>
-    setTimeout(() => f() |> resolve, ms) |> ignore
-  );
 
   testAsync("fromPromise (resolved)", done_ => {
     Js.Promise.resolve(42)
@@ -104,12 +97,6 @@ describe("FutureJs", () => {
       done_();
     });
   });
-
-  let checkPromisedValue = (done_, expected, actual) => {
-    equals(expected, actual);
-    done_();
-    Js.Promise.resolve(());
-  };
 
   testAsync("toPromise (trivial Ok result)", done_ => {
     Future.value(Belt.Result.Ok("payload"))
