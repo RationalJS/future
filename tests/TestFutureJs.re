@@ -98,30 +98,14 @@ describe("FutureJs", () => {
     });
   });
 
-  testAsync("toPromise (trivial Ok result)", done_ => {
-    Future.value(Belt.Result.Ok("payload"))
-    |> FutureJs.toPromise
-    |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.then_(checkPromisedValue(done_, "payload"));
-  });
-
-  testAsync("toPromise (trivial Error result)", done_ => {
-    let err = TestError("error!");
-
-    Future.value(Belt.Result.Error(err))
-    |> FutureJs.toPromise
-    |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.catch(checkPromisedValue(done_, err));
-  });
-
-  testAsync("toPromise (Ok result from delayed future)", done_ => {
+  testAsync("toPromise (Ok result)", done_ => {
     delay(5, () => Belt.Result.Ok("payload"))
     |> FutureJs.toPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
     |> Js.Promise.then_(checkPromisedValue(done_, "payload"));
   });
 
-  testAsync("toPromise (Error result from delayed future)", done_ => {
+  testAsync("toPromise (Error result)", done_ => {
     let err = TestError("error!");
 
     delay(5, () => Belt.Result.Error(err))
