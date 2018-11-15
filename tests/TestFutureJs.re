@@ -1,5 +1,5 @@
 open BsOspec.Cjs;
-exception TestError(string);
+open TestUtil;
 
 describe("FutureJs", () => {
   let errorTransformer = x => x;
@@ -96,5 +96,28 @@ describe("FutureJs", () => {
 
       done_();
     });
-  })
+  });
+
+  testAsync("toPromise", done_ => {
+    delay(5, () => "payload")
+    |> FutureJs.toPromise
+    |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.then_(checkPromisedValue(done_, "payload"));
+  });
+
+  testAsync("resultToPromise (Ok result)", done_ => {
+    delay(5, () => Belt.Result.Ok("payload"))
+    |> FutureJs.resultToPromise
+    |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.then_(checkPromisedValue(done_, "payload"));
+  });
+
+  testAsync("resultToPromise (Error result)", done_ => {
+    let err = TestError("error!");
+    delay(5, () => Belt.Result.Error(err))
+    |> FutureJs.resultToPromise
+    |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.catch(checkPromisedValue(done_, err));
+  });
+
 });
