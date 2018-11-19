@@ -43,8 +43,7 @@ To get the value of a future, use `Future.get`:
 
 ```js
 let futureGreeting = Future.make(resolve => resolve("hi"));
-futureGreeting
-->Future.get(x => Js.log("Got value: " ++ x));
+futureGreeting->Future.get(x => Js.log("Got value: " ++ x));
 
 /* Alternatively: */
 
@@ -61,11 +60,9 @@ let future_A = Future.value(99);
 let future_B = future_A->Future.map(n => n + 1);
 
 
-future_A
-->Future.get(n => Js.log(n)); /* logs: 99 */
+future_A->Future.get(n => Js.log(n)); /* logs: 99 */
 
-future_B
-->Future.get(n => Js.log(n)); /* logs: 100 */
+future_B->Future.get(n => Js.log(n)); /* logs: 100 */
 ```
 
 And finally, if you `map` a future and return **another** future, you probably want to `flatMap` instead:
