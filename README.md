@@ -43,13 +43,12 @@ To get the value of a future, use `Future.get`:
 
 ```js
 let futureGreeting = Future.make(resolve => resolve("hi"));
-futureGreeting
-|. Future.get(x => Js.log("Got value: " ++ x));
+futureGreeting->Future.get(x => Js.log("Got value: " ++ x));
 
 /* Alternatively: */
 
 Future.make(resolve => resolve("hi"))
-|. Future.get(x => Js.log("Got value: " ++ x));
+->Future.get(x => Js.log("Got value: " ++ x));
 ```
 
 `Future.get` only *retrieves* the future value. If you want to **transform** it to a *different* value, then you should use `Future.map`:
@@ -58,14 +57,12 @@ Future.make(resolve => resolve("hi"))
 /* Shortcut for: let future_A = Future.make(resolve => resolve(99)); */
 let future_A = Future.value(99);
 
-let future_B = future_A |. Future.map(n => n + 1);
+let future_B = future_A->Future.map(n => n + 1);
 
 
-future_A
-|. Future.get(n => Js.log(n)); /* logs: 99 */
+future_A->Future.get(n => Js.log(n)); /* logs: 99 */
 
-future_B
-|. Future.get(n => Js.log(n)); /* logs: 100 */
+future_B->Future.get(n => Js.log(n)); /* logs: 100 */
 ```
 
 And finally, if you `map` a future and return **another** future, you probably want to `flatMap` instead:
@@ -73,8 +70,8 @@ And finally, if you `map` a future and return **another** future, you probably w
 ```js
 let futureNum = Future.value(50);
 
-let ft_a = futureNum |. Future.map(n => Future.value(n + 10));
-let ft_b = futureNum |. Future.flatMap(n => Future.value(n + 20));
+let ft_a = futureNum->Future.map(n => Future.value(n + 10));
+let ft_b = futureNum->Future.flatMap(n => Future.value(n + 20));
 
 /* ft_a has type future(future(int)) – probably not what you want. */
 /* ft_b has type future(int) */
@@ -93,7 +90,7 @@ Core functions. **Note:** `_` represents the future itself as inserted by `|.` (
 
 ### Belt.Result
 
-Convenience functions when working with a future `Belt.Result`. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
+Convenience functions when working with a future `Belt.Result`. **Note:** `_` represents the future itself as inserted by `->` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
 
 **Note 2**: The terms `Result.Ok` and `Result.Error` in this context are expected to be read as `Belt.Result.Ok` and `Belt.Result.Error`.
 
@@ -138,9 +135,9 @@ Example use:
 let handleError = Js.String.make;
 
 somePromiseGetter()
-|. FutureJs.fromPromise(handleError)
-|. Future.map(value => Js.log2("It worked!", value))
-|. Future.mapError(err => Js.log2("uh on", err));
+->FutureJs.fromPromise(handleError)
+->Future.map(value => Js.log2("It worked!", value))
+->Future.mapError(err => Js.log2("uh on", err));
 ```
 
 See [Composible Error Handling in OCaml][error-handling] for several strategies that you may employ.
