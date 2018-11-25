@@ -100,5 +100,5 @@ let tapError = (future, f) => future |. tap(r => switch(r) {
   | Ok(_) => ()
 });
 
-let (>>=) = (f, t) => flatMapOk(t, f);
-let (<*>) = (f, t) => mapOk(f, t);
+let (>>=) = flatMapOk;
+let (<$>) = mapOk;

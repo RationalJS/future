@@ -118,11 +118,10 @@ describe("Future", () => {
 
 
 describe("Future Belt.Result", () => {
+  let ((>>=), (<$>)) = Future.((>>=), (<$>));
 
   test("mapOk", () => {
-    Belt.Result.Ok("two")
-    |. Future.value
-    |. Future.mapOk(s => s ++ "!")
+    (Belt.Result.Ok("two") |. Future.value <$> (s => s ++ "!"))
     |. Future.get(r => {
       Belt.Result.getExn(r) |. equals("two!");
     });
@@ -154,9 +153,10 @@ describe("Future Belt.Result", () => {
   });
 
   test("flatMapOk", () => {
-    Belt.Result.Ok("four")
-    |. Future.value
-    |. Future.flatMapOk(s => Belt.Result.Ok(s ++ "!") |. Future.value)
+    (
+      Belt.Result.Ok("four") |. Future.value
+      >>= (s => Belt.Result.Ok(s ++ "!") |. Future.value)
+    )
     |. Future.get(r => Belt.Result.getExn(r) |. equals("four!"));
 
     Belt.Result.Error("err4.1")
