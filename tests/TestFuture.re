@@ -121,7 +121,9 @@ describe("Future Belt.Result", () => {
   let ((>>=), (<$>)) = Future.((>>=), (<$>));
 
   test("mapOk", () => {
-    (Belt.Result.Ok("two") |. Future.value <$> (s => s ++ "!"))
+    Belt.Result.Ok("two")
+    |. Future.value
+    |. Future.mapOk(s => s ++ "!")
     |. Future.get(r => {
       Belt.Result.getExn(r) |. equals("two!");
     });
@@ -153,10 +155,9 @@ describe("Future Belt.Result", () => {
   });
 
   test("flatMapOk", () => {
-    (
-      Belt.Result.Ok("four") |. Future.value
-      >>= (s => Belt.Result.Ok(s ++ "!") |. Future.value)
-    )
+    Belt.Result.Ok("four")
+    |. Future.value
+    |. Future.flatMapOk(s => Belt.Result.Ok(s ++ "!") |. Future.value)
     |. Future.get(r => Belt.Result.getExn(r) |. equals("four!"));
 
     Belt.Result.Error("err4.1")
@@ -262,4 +263,39 @@ describe("Future Belt.Result", () => {
     });
   });
 
+  test("<$>", () => {
+    Future.value(Belt.Result.Ok("infix ops"))
+    <$> ((++)(" "))
+    <$> ((++)("rock!"))
+    |. Future.get(r =>
+      r
+      |. Belt.Result.getExn
+      |. equals("infix ops rock!2")
+    );
+
+    Future.value(Belt.Result.Error("infix ops"))
+    <$> ((++)(" "))
+    <$> ((++)("suck!"))
+    |. Future.get(r => switch(r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(e) => e |. equals("infix ops")
+    });
+  });
+
+  test(">>=", () => {
+    Future.value(Belt.Result.Ok("infix ops"))
+    >>= (s => (s ++ " still rock!") |. Belt.Result.Ok |. Future.value)
+    |. Future.get(r =>
+      r
+      |. Belt.Result.getExn
+      |. equals("infix ops still rock!")
+    );
+
+    Future.value(Belt.Result.Error("infix ops"))
+    >>= (s => (s ++ " still suck!") |. Belt.Result.Ok |. Future.value)
+    |. Future.get(r => switch (r) {
+      | Ok(_) => raise(TestError("shouldn't be possible"))
+      | Error(e) => e |. equals("infix ops");
+    });
+  });
 });
