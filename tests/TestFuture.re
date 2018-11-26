@@ -283,8 +283,11 @@ describe("Future Belt.Result", () => {
   });
 
   test(">>=", () => {
+    let appendToString = (appendedString, s) =>
+      (s ++ appendedString) |. Belt.Result.Ok |. Future.value;
+
     Future.value(Belt.Result.Ok("infix ops"))
-    >>= (s => (s ++ " still rock!") |. Belt.Result.Ok |. Future.value)
+    >>= appendToString(" still rock!")
     |. Future.get(r =>
       r
       |. Belt.Result.getExn
@@ -292,7 +295,7 @@ describe("Future Belt.Result", () => {
     );
 
     Future.value(Belt.Result.Error("infix ops"))
-    >>= (s => (s ++ " still suck!") |. Belt.Result.Ok |. Future.value)
+    >>= appendToString(" still sucks!")
     |. Future.get(r => switch (r) {
       | Ok(_) => raise(TestError("shouldn't be possible"))
       | Error(e) => e |. equals("infix ops");
