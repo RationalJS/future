@@ -270,7 +270,7 @@ describe("Future Belt.Result", () => {
     |. Future.get(r =>
       r
       |. Belt.Result.getExn
-      |. equals("infix ops rock!2")
+      |. equals("infix ops rock!")
     );
 
     Future.value(Belt.Result.Error("infix ops"))
