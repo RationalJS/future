@@ -10,7 +10,7 @@
  *   ```reason
  *   let errorTransformer = (error) =>
  *     Js.String.make(error)
- *     |. (str => /*... do your transforms here */ str);
+ *     ->(str => /*... do your transforms here */ str);
 *    ```
  */
 let fromPromise = (promise, errorTransformer) =>
