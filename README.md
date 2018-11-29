@@ -79,7 +79,7 @@ let ft_b = futureNum->Future.flatMap(n => Future.value(n + 20));
 
 ## API
 
-Core functions. **Note:** `_` represents the future itself as inserted by `|.` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
+Core functions. **Note:** `_` represents the future itself as inserted by `->` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
 
 - `Future.make(resolver)` - Create a new, potentially-async future.
 - `Future.value(x)` - Create a new future with a plain value (synchronous).
