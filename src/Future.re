@@ -99,3 +99,6 @@ let tapError = (future, f) => future |. tap(r => switch(r) {
   | Belt.Result.Error(v) => f(v) |. ignore
   | Ok(_) => ()
 });
+
+let (>>=) = flatMapOk;
+let (<$>) = mapOk;
