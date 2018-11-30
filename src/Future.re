@@ -11,7 +11,7 @@ let make = resolver => {
     switch (data^) {
     | None =>
       data := Some(result);
-      (callbacks^)->Belt.List.reverse->(Belt.List.forEach(cb => cb(result)));
+      (callbacks^)->Belt.List.reverse->Belt.List.forEach(cb => cb(result));
       /* Clean up memory usage */
       callbacks := [];
     | Some(_) => () /* Do nothing; theoretically not possible */
@@ -60,39 +60,33 @@ let get = (Future(getFn), f) => getFn(f);
  * Future Belt.Result convenience functions,
  * for working with a type Future.t( Belt.Result.t('a,'b) )
  */
-let mapOk = (future, f) => future->(map(r => Belt.Result.map(r, f)));
+let mapOk = (future, f) => future->map(r => Belt.Result.map(r, f));
 
 let mapError = (future, f) =>
   future
-  ->(
-      map(r =>
-        switch (r) {
-        | Belt.Result.Error(v) => Belt.Result.Error(f(v))
-        | Ok(a) => Belt.Result.Ok(a)
-        }
-      )
+  ->map(r =>
+      switch (r) {
+      | Belt.Result.Error(v) => Belt.Result.Error(f(v))
+      | Ok(a) => Belt.Result.Ok(a)
+      }
     );
 
 let flatMapOk = (future, f) =>
   future
-  ->(
-      flatMap(r =>
-        switch (r) {
-        | Belt.Result.Ok(v) => f(v)
-        | Belt.Result.Error(e) => value(Belt.Result.Error(e))
-        }
-      )
+  ->flatMap(r =>
+      switch (r) {
+      | Belt.Result.Ok(v) => f(v)
+      | Belt.Result.Error(e) => value(Belt.Result.Error(e))
+      }
     );
 
 let flatMapError = (future, f) =>
   future
-  ->(
-      flatMap(r =>
-        switch (r) {
-        | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
-        | Belt.Result.Error(e) => f(e)
-        }
-      )
+  ->flatMap(r =>
+      switch (r) {
+      | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
+      | Belt.Result.Error(e) => f(e)
+      }
     );
 
 let mapOk2 = (fa, fb, f) => flatMapOk(fa, a => mapOk(fb, b => f(a, b)));
@@ -107,24 +101,20 @@ let mapOk5 = (fa, fb, fc, fd, fe, f) =>
 
 let tapOk = (future, f) =>
   future
-  ->(
-      tap(r =>
-        switch (r) {
-        | Belt.Result.Ok(v) => f(v)->ignore
-        | Error(_) => ()
-        }
-      )
+  ->tap(r =>
+      switch (r) {
+      | Belt.Result.Ok(v) => f(v)->ignore
+      | Error(_) => ()
+      }
     );
 
 let tapError = (future, f) =>
   future
-  ->(
-      tap(r =>
-        switch (r) {
-        | Belt.Result.Error(v) => f(v)->ignore
-        | Ok(_) => ()
-        }
-      )
+  ->tap(r =>
+      switch (r) {
+      | Belt.Result.Error(v) => f(v)->ignore
+      | Ok(_) => ()
+      }
     );
 
 let (>>=) = flatMapOk;

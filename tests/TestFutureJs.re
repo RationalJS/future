@@ -6,29 +6,25 @@ describe("FutureJs", () => {
 
   testAsync("fromPromise (resolved)", done_ =>
     Js.Promise.resolve(42)
-    ->(FutureJs.fromPromise(errorTransformer))
-    ->(
-        Future.get(r => {
-          Belt.Result.getExn(r)->(equals(42));
-          done_();
-        })
-      )
+    ->FutureJs.fromPromise(errorTransformer)
+    ->Future.get(r => {
+        Belt.Result.getExn(r)->equals(42);
+        done_();
+      })
   );
 
   testAsync("fromPromise (rejected)", done_ => {
     let err = TestError("oops!");
     Js.Promise.reject(err)
-    ->(FutureJs.fromPromise(errorTransformer))
-    ->(
-        Future.get(r =>
-          (
-            switch (r) {
-            | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-            | Belt.Result.Error(e) => e->(equals(err))
-            }
-          )
-          |> (_ => done_())
+    ->FutureJs.fromPromise(errorTransformer)
+    ->Future.get(r =>
+        (
+          switch (r) {
+          | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
+          | Belt.Result.Error(e) => e->equals(err)
+          }
         )
+        |> (_ => done_())
       );
   });
 
@@ -37,16 +33,14 @@ describe("FutureJs", () => {
     let promise = Js.Promise.make((~resolve as _, ~reject) => reject(. err));
 
     FutureJs.fromPromise(promise, errorTransformer)
-    ->(
-        Future.get(r => {
-          switch (r) {
-          | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-          | Belt.Result.Error(e) => e->(equals(err))
-          };
+    ->Future.get(r => {
+        switch (r) {
+        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
+        | Belt.Result.Error(e) => e->equals(err)
+        };
 
-          done_();
-        })
-      );
+        done_();
+      });
   });
 
   testAsync("fromPromise (internal exception)", done_ => {
@@ -55,16 +49,14 @@ describe("FutureJs", () => {
       Js.Promise.make((~resolve as _, ~reject as _) => raise(err));
 
     FutureJs.fromPromise(promise, errorTransformer)
-    ->(
-        Future.get(r => {
-          switch (r) {
-          | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-          | Belt.Result.Error(s) => s->(equals(err))
-          };
+    ->Future.get(r => {
+        switch (r) {
+        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
+        | Belt.Result.Error(s) => s->equals(err)
+        };
 
-          done_();
-        })
-      );
+        done_();
+      });
   });
 
   testAsync("fromPromise (wrapped callback)", done_ => {
@@ -76,16 +68,14 @@ describe("FutureJs", () => {
       );
 
     FutureJs.fromPromise(promise, errorTransformer)
-    ->(
-        Future.get(r => {
-          switch (r) {
-          | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-          | Belt.Result.Error(s) => s->(equals(err))
-          };
+    ->Future.get(r => {
+        switch (r) {
+        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
+        | Belt.Result.Error(s) => s->equals(err)
+        };
 
-          done_();
-        })
-      );
+        done_();
+      });
   });
 
   testAsync("fromPromise (layered failure)", done_ => {
@@ -98,17 +88,15 @@ describe("FutureJs", () => {
     let future = () => FutureJs.fromPromise(promise, errorTransformer);
 
     Future.value(Belt.Result.Ok("ignored"))
-    ->(Future.flatMapOk(_ => future()))
-    ->(
-        Future.get(r => {
-          switch (r) {
-          | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-          | Belt.Result.Error(s) => s->(equals(err))
-          };
+    ->Future.flatMapOk(_ => future())
+    ->Future.get(r => {
+        switch (r) {
+        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
+        | Belt.Result.Error(s) => s->equals(err)
+        };
 
-          done_();
-        })
-      );
+        done_();
+      });
   });
 
   testAsync("toPromise", done_ =>
