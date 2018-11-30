@@ -30,19 +30,17 @@ let fromPromise = (promise, errorTransformer) =>
 
 let toPromise = future =>
   Js.Promise.make((~resolve, ~reject as _) =>
-    future->(Future.get(value => resolve(. value)))
+    future->Future.get(value => resolve(. value))
   );
 
 let resultToPromise = future =>
   Js.Promise.make((~resolve, ~reject) =>
     future
-    ->(
-        Future.map(result =>
-          switch (result) {
-          | Belt.Result.Ok(result) => resolve(. result)
-          | Belt.Result.Error(error) => reject(. error)
-          }
-        )
+    ->Future.map(result =>
+        switch (result) {
+        | Belt.Result.Ok(result) => resolve(. result)
+        | Belt.Result.Error(error) => reject(. error)
+        }
       )
     ->ignore
   );
