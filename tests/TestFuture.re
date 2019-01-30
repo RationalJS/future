@@ -89,15 +89,15 @@ describe("Future", () => {
 
     (count^)->equals(~m="Callback is async", 0);
 
-    future
-    ->Future.get(_ => (count^)->equals(~m="Runs after previous future", 1));
+    future->Future.get(_ =>
+      (count^)->equals(~m="Runs after previous future", 1)
+    );
 
     (count^)->equals(~m="Callback is async (2)", 0);
 
-    future
-    ->Future.get(_ =>
-        (count^)->equals(~m="Previous future only runs once", 1)
-      );
+    future->Future.get(_ =>
+      (count^)->equals(~m="Previous future only runs once", 1)
+    );
 
     (count^)->equals(0, ~m="Callback is async (3)");
 
