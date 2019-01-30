@@ -103,6 +103,16 @@ describe("Future", () => {
 
     future->Future.get(_ => done_());
   });
+
+  testAsync("all (async)", done_ =>
+    Future.all([Future.value(1), delay(25, () => 2), delay(50, () => 3)])
+    ->Future.get(result =>
+        switch (result) {
+        | [1, 2, 3] => done_()
+        | _ => raise(TestError("Expected [1, 2, 3]"))
+        }
+      )
+  );
 });
 
 describe("Future Belt.Result", () => {
