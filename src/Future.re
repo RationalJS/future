@@ -63,31 +63,28 @@ let get = (Future(getFn), f) => getFn(f);
 let mapOk = (future, f) => future->map(r => Belt.Result.map(r, f));
 
 let mapError = (future, f) =>
-  future
-  ->map(r =>
-      switch (r) {
-      | Belt.Result.Error(v) => Belt.Result.Error(f(v))
-      | Ok(a) => Belt.Result.Ok(a)
-      }
-    );
+  future->map(r =>
+    switch (r) {
+    | Belt.Result.Error(v) => Belt.Result.Error(f(v))
+    | Ok(a) => Belt.Result.Ok(a)
+    }
+  );
 
 let flatMapOk = (future, f) =>
-  future
-  ->flatMap(r =>
-      switch (r) {
-      | Belt.Result.Ok(v) => f(v)
-      | Belt.Result.Error(e) => value(Belt.Result.Error(e))
-      }
-    );
+  future->flatMap(r =>
+    switch (r) {
+    | Belt.Result.Ok(v) => f(v)
+    | Belt.Result.Error(e) => value(Belt.Result.Error(e))
+    }
+  );
 
 let flatMapError = (future, f) =>
-  future
-  ->flatMap(r =>
-      switch (r) {
-      | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
-      | Belt.Result.Error(e) => f(e)
-      }
-    );
+  future->flatMap(r =>
+    switch (r) {
+    | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
+    | Belt.Result.Error(e) => f(e)
+    }
+  );
 
 let mapOk2 = (fa, fb, f) => flatMapOk(fa, a => mapOk(fb, b => f(a, b)));
 
@@ -100,22 +97,20 @@ let mapOk5 = (fa, fb, fc, fd, fe, f) =>
   mapOk4(mapOk2(fa, fb, f), fc, fd, fe, v => v);
 
 let tapOk = (future, f) =>
-  future
-  ->tap(r =>
-      switch (r) {
-      | Belt.Result.Ok(v) => f(v)->ignore
-      | Error(_) => ()
-      }
-    );
+  future->tap(r =>
+    switch (r) {
+    | Belt.Result.Ok(v) => f(v)->ignore
+    | Error(_) => ()
+    }
+  );
 
 let tapError = (future, f) =>
-  future
-  ->tap(r =>
-      switch (r) {
-      | Belt.Result.Error(v) => f(v)->ignore
-      | Ok(_) => ()
-      }
-    );
+  future->tap(r =>
+    switch (r) {
+    | Belt.Result.Error(v) => f(v)->ignore
+    | Ok(_) => ()
+    }
+  );
 
 let (>>=) = flatMapOk;
 let (<$>) = mapOk;
