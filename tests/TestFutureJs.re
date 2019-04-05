@@ -113,8 +113,16 @@ describe("FutureJs", () => {
     |> Js.Promise.then_(checkPromisedValue(done_, "payload"))
   );
 
-  testAsync("resultToPromise (Error result)", done_ => {
+  testAsync("resultToPromise (Error exn)", done_ => {
     let err = TestError("error!");
+    delay(5, () => Belt.Result.Error(err))
+    |> FutureJs.resultToPromise
+    |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
+    |> Js.Promise.catch(checkPromisedValue(done_, err));
+  });
+
+  testAsync("resultToPromise (Error `PolymorphicVariant)", done_ => {
+    let err = `TestError;
     delay(5, () => Belt.Result.Error(err))
     |> FutureJs.resultToPromise
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
