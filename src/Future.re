@@ -49,6 +49,16 @@ let map4 = (fa, fb, fc, fd, f) => map3(map2(fa, fb, f), fc, fd, v => v);
 let map5 = (fa, fb, fc, fd, fe, f) =>
   map4(map2(fa, fb, f), fc, fd, fe, v => v);
 
+let rec all = futures =>
+  switch (futures) {
+  | [head, ...tail] =>
+    all(tail)
+    ->flatMap(tailResult =>
+        head->map(headResult => [headResult, ...tailResult])
+      )
+  | [] => value([])
+  };
+
 let tap = (Future(get) as future, f) => {
   get(f);
   future;
