@@ -1,6 +1,6 @@
 {
   "name": "reason-future",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
