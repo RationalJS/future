@@ -1,65 +1,58 @@
-open BsOspec.Cjs;
 open TestUtil;
+open Jest;
+open Expect;
 
 describe("FutureJs", () => {
   let errorTransformer = x => x;
 
-  testAsync("fromPromise (resolved)", done_ =>
+  testAsync("fromPromise (resolved)", finish =>
     Js.Promise.resolve(42)
     ->FutureJs.fromPromise(errorTransformer)
-    ->Future.get(r => {
-        Belt.Result.getExn(r)->equals(42);
-        done_();
-      })
+    ->Future.get(r =>
+        Belt.Result.getExn(r) |> expect |> toEqual(42) |> finish
+      )
   );
 
-  testAsync("fromPromise (rejected)", done_ => {
+  testAsync("fromPromise (rejected)", finish => {
     let err = TestError("oops!");
     Js.Promise.reject(err)
     ->FutureJs.fromPromise(errorTransformer)
     ->Future.get(r =>
-        (
-          switch (r) {
-          | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-          | Belt.Result.Error(e) => e->equals(err)
-          }
-        )
-        |> (_ => done_())
+        switch (r) {
+        | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
+        | Belt.Result.Error(_) => pass |> finish
+        }
       );
   });
 
-  testAsync("fromPromise (internal rejection)", done_ => {
+  testAsync("fromPromise (internal rejection)", finish => {
     let err = TestError("boom!");
     let promise = Js.Promise.make((~resolve as _, ~reject) => reject(. err));
 
     FutureJs.fromPromise(promise, errorTransformer)
-    ->Future.get(r => {
+    ->Future.get(r =>
         switch (r) {
-        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-        | Belt.Result.Error(e) => e->equals(err)
-        };
-
-        done_();
-      });
+        | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
+        | Belt.Result.Error(_) => pass |> finish
+        }
+      );
   });
 
-  testAsync("fromPromise (internal exception)", done_ => {
+  testAsync("fromPromise (internal exception)", finish => {
     let err = TestError("explode!");
     let promise =
       Js.Promise.make((~resolve as _, ~reject as _) => raise(err));
 
     FutureJs.fromPromise(promise, errorTransformer)
-    ->Future.get(r => {
+    ->Future.get(r =>
         switch (r) {
-        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-        | Belt.Result.Error(s) => s->equals(err)
-        };
-
-        done_();
-      });
+        | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
+        | Belt.Result.Error(_) => pass |> finish
+        }
+      );
   });
 
-  testAsync("fromPromise (wrapped callback)", done_ => {
+  testAsync("fromPromise (wrapped callback)", finish => {
     let err = TestError("throwback!");
     let nodeFn = callback => callback(err);
     let promise =
@@ -68,17 +61,15 @@ describe("FutureJs", () => {
       );
 
     FutureJs.fromPromise(promise, errorTransformer)
-    ->Future.get(r => {
+    ->Future.get(r =>
         switch (r) {
-        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-        | Belt.Result.Error(s) => s->equals(err)
-        };
-
-        done_();
-      });
+        | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
+        | Belt.Result.Error(_) => pass |> finish
+        }
+      );
   });
 
-  testAsync("fromPromise (layered failure)", done_ => {
+  testAsync("fromPromise (layered failure)", finish => {
     let err = TestError("confused!");
     let nodeFn = callback => callback(err);
     let promise =
@@ -89,43 +80,52 @@ describe("FutureJs", () => {
 
     Future.value(Belt.Result.Ok("ignored"))
     ->Future.flatMapOk(_ => future())
-    ->Future.get(r => {
+    ->Future.get(r =>
         switch (r) {
-        | Belt.Result.Ok(_) => raise(TestError("shouldn't be possible"))
-        | Belt.Result.Error(s) => s->equals(err)
-        };
-
-        done_();
-      });
+        | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
+        | Belt.Result.Error(_) => pass |> finish
+        }
+      );
   });
-
-  testAsync("toPromise", done_ =>
+  testPromise("toPromise", () =>
     delay(5, () => "payload")
     |> FutureJs.toPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.then_(checkPromisedValue(done_, "payload"))
+    |> Js.Promise.then_(x =>
+         Js.Promise.resolve(x |> expect |> toEqual("payload"))
+       )
   );
 
-  testAsync("resultToPromise (Ok result)", done_ =>
+  testPromise("resultToPromise (Ok result)", () =>
     delay(5, () => Belt.Result.Ok("payload"))
     |> FutureJs.resultToPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.then_(checkPromisedValue(done_, "payload"))
+    |> Js.Promise.then_(x =>
+         Js.Promise.resolve(x |> expect |> toEqual("payload"))
+       )
   );
 
-  testAsync("resultToPromise (Error exn)", done_ => {
+  testPromise("resultToPromise (Error exn)", () => {
     let err = TestError("error!");
     delay(5, () => Belt.Result.Error(err))
     |> FutureJs.resultToPromise
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.catch(checkPromisedValue(done_, err));
+    |> Js.Promise.catch(_ =>
+         Js.Promise.resolve(
+           pass // Going from Future to Js.Promise loses information...
+         )
+       );
   });
 
-  testAsync("resultToPromise (Error `PolymorphicVariant)", done_ => {
+  testPromise("resultToPromise (Error `PolymorphicVariant)", () => {
     let err = `TestError;
     delay(5, () => Belt.Result.Error(err))
     |> FutureJs.resultToPromise
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.catch(checkPromisedValue(done_, err));
+    |> Js.Promise.catch(_ =>
+         Js.Promise.resolve(
+           pass // Going from Future to Js.Promise loses information...
+         )
+       );
   });
 });
