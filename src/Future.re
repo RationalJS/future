@@ -3,6 +3,26 @@ type getFn('a) = ('a => unit) => unit;
 type t('a) =
   | Future(getFn('a));
 
+let trampoline = {
+  let running = ref(false);
+  let callbacks = [||];
+  let rec runLoop = callback => {
+    callback();
+    switch (Js.Array.pop(callbacks)) {
+    | None => ()
+    | Some(callback) => runLoop(callback)
+    };
+  };
+  callback =>
+    if (running^) {
+      Js.Array.unshift(callback, callbacks) |> ignore;
+    } else {
+      running := true;
+      runLoop(callback);
+      running := false;
+    };
+};
+
 let make = resolver => {
   let callbacks = ref([]);
   let data = ref(None);
@@ -11,7 +31,9 @@ let make = resolver => {
     switch (data^) {
     | None =>
       data := Some(result);
-      (callbacks^)->Belt.List.reverse->Belt.List.forEach(cb => cb(result));
+      (callbacks^)
+      ->Belt.List.reverse
+      ->Belt.List.forEach(cb => trampoline(() => cb(result)));
       /* Clean up memory usage */
       callbacks := [];
     | Some(_) => () /* Do nothing; theoretically not possible */
@@ -21,7 +43,7 @@ let make = resolver => {
   Future(
     resolve =>
       switch (data^) {
-      | Some(result) => resolve(result)
+      | Some(result) => trampoline(() => resolve(result))
       | None => callbacks := [resolve, ...callbacks^]
       },
   );
