@@ -313,7 +313,7 @@ describe("Future Belt.Result", () => {
   });
 
   testAsync("value recursion is stack safe", finish => {
-    let next = x => Future.value(x + 1);
+    let next = x => Future.value(~executor=`trampoline, x + 1);
     let numberOfLoops = 10000;
     let rec loop = x => {
       next(x)
@@ -330,7 +330,7 @@ describe("Future Belt.Result", () => {
   });
 
   testAsync("async recursion is stack safe", finish => {
-    let next = x => delay(1, () => x + 1);
+    let next = x => delay(~executor=`trampoline, 1, () => x + 1);
     let numberOfLoops = 1000;
     let rec loop = x => {
       next(x)

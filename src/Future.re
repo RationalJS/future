@@ -1,7 +1,9 @@
 type getFn('a) = ('a => unit) => unit;
 
+type executorOptions = [ | `none | `trampoline];
+
 type t('a) =
-  | Future(getFn('a));
+  | Future(getFn('a), executorOptions);
 
 let trampoline = {
   let running = ref(false);
@@ -23,9 +25,15 @@ let trampoline = {
     };
 };
 
-let make = resolver => {
+let make = (~executor: executorOptions=`none, resolver) => {
   let callbacks = ref([]);
   let data = ref(None);
+
+  let runCallback =
+    switch (executor) {
+    | `none => ((result, cb) => cb(result))
+    | `trampoline => ((result, cb) => trampoline(() => cb(result)))
+    };
 
   resolver(result =>
     switch (data^) {
@@ -33,7 +41,7 @@ let make = resolver => {
       data := Some(result);
       (callbacks^)
       ->Belt.List.reverse
-      ->Belt.List.forEach(cb => trampoline(() => cb(result)));
+      ->Belt.List.forEach(runCallback(result));
       /* Clean up memory usage */
       callbacks := [];
     | Some(_) => () /* Do nothing; theoretically not possible */
@@ -46,18 +54,20 @@ let make = resolver => {
       | Some(result) => trampoline(() => resolve(result))
       | None => callbacks := [resolve, ...callbacks^]
       },
+    executor,
   );
 };
 
-let value = x => make(resolve => resolve(x));
+let value = (~executor: executorOptions=`none, x) =>
+  make(~executor, resolve => resolve(x));
 
-let map = (Future(get), f) =>
-  make(resolve => get(result => resolve(f(result))));
+let map = (Future(get, executor), f) =>
+  make(~executor, resolve => get(result => resolve(f(result))));
 
-let flatMap = (Future(get), f) =>
-  make(resolve =>
+let flatMap = (Future(get, executor), f) =>
+  make(~executor, resolve =>
     get(result => {
-      let Future(get2) = f(result);
+      let Future(get2, _) = f(result);
       get2(resolve);
     })
   );
@@ -81,12 +91,12 @@ let rec all = futures =>
   | [] => value([])
   };
 
-let tap = (Future(get) as future, f) => {
+let tap = (Future(get, _) as future, f) => {
   get(f);
   future;
 };
 
-let get = (Future(getFn), f) => getFn(f);
+let get = (Future(getFn, _), f) => getFn(f);
 
 /* *
  * Future Belt.Result convenience functions,
