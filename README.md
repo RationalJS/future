@@ -143,6 +143,15 @@ somePromiseGetter()
 
 See [Composible Error Handling in OCaml][error-handling] for several strategies that you may employ.
 
+### Stack Safety
+
+By default this library is not stack safe, you will recieve a 'Maximum call stack size exceeded' error if you recurse too deeply. You can opt into stack safety by passing an optional parameter to the constructors of trampoline. This has a slight overhead. For example:
+
+```reason
+let stackSafe = Future.make(~executor=`trampoline, resolver);
+let stackSafeValue = Future.value(~executor=`trampoline, "Value");
+```
+
 ## TODO
 
 - [ ] Implement cancellation tokens

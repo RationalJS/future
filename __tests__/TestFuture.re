@@ -317,8 +317,13 @@ describe("Future Belt.Result", () => {
     let numberOfLoops = 10000;
     let rec loop = x => {
       next(x)
+      ->Future.flatMap(x => Future.value(x + 1))
+      ->Future.map(x => x + 1)
+      ->Future.flatMap(x =>
+          Future.value(x + 1)->Future.flatMap(x => Future.value(x + 1))
+        )
       ->Future.flatMap(x' =>
-          if (x' == numberOfLoops) {
+          if (x' > numberOfLoops) {
             Future.value(x');
           } else {
             loop(x');
@@ -326,7 +331,9 @@ describe("Future Belt.Result", () => {
         );
     };
     loop(0)
-    ->Future.get(r => r |> expect |> toEqual(numberOfLoops) |> finish);
+    ->Future.get(r =>
+        r |> expect |> toBeGreaterThan(numberOfLoops) |> finish
+      );
   });
 
   testAsync("async recursion is stack safe", finish => {
@@ -344,5 +351,24 @@ describe("Future Belt.Result", () => {
     };
     loop(0)
     ->Future.get(r => r |> expect |> toEqual(numberOfLoops) |> finish);
+  });
+
+  test("value recursion blows the stack with default executor", () => {
+    let next = x => Future.value(x + 1);
+    let numberOfLoops = 10000;
+    let rec loop = x => {
+      next(x)
+      ->Future.flatMap(x' =>
+          if (x' > numberOfLoops) {
+            Future.value(x');
+          } else {
+            loop(x');
+          }
+        );
+    };
+    expect(() =>
+      loop(0)
+    )
+    |> toThrowMessage("Maximum call stack size exceeded");
   });
 });

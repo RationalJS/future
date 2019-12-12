@@ -1,9 +1,9 @@
 type getFn('a) = ('a => unit) => unit;
 
-type executorOptions = [ | `none | `trampoline];
+type executorType = [ | `none | `trampoline];
 
 type t('a) =
-  | Future(getFn('a), executorOptions);
+  | Future(getFn('a), executorType);
 
 let trampoline = {
   let running = ref(false);
@@ -25,7 +25,7 @@ let trampoline = {
     };
 };
 
-let make = (~executor: executorOptions=`none, resolver) => {
+let make = (~executor: executorType=`none, resolver) => {
   let callbacks = ref([]);
   let data = ref(None);
 
@@ -51,14 +51,14 @@ let make = (~executor: executorOptions=`none, resolver) => {
   Future(
     resolve =>
       switch (data^) {
-      | Some(result) => trampoline(() => resolve(result))
+      | Some(result) => runCallback(result, resolve)
       | None => callbacks := [resolve, ...callbacks^]
       },
     executor,
   );
 };
 
-let value = (~executor: executorOptions=`none, x) =>
+let value = (~executor: executorType=`none, x) =>
   make(~executor, resolve => resolve(x));
 
 let map = (Future(get, executor), f) =>
