@@ -1,7 +1,8 @@
 type getFn('a) = ('a => unit) => unit;
-type t('a) = Future(getFn('a));
-let make: (('a => unit) => 'b) => t('a);
-let value: 'a => t('a);
+type executorType = [ `none | `trampoline ];
+type t('a);
+let make: (~executor: executorType=?, ('a => unit) => 'b) => t('a);
+let value: (~executor: executorType=?, 'a) => t('a);
 let map: (t('a), 'a => 'b) => t('b);
 let flatMap: (t('a), 'a => t('b)) => t('b);
 let map2: (t('a), t('b), ('a, 'b) => 'c) => t('c);
