@@ -26,6 +26,7 @@ let fromPromise = (promise, errorTransformer) =>
          |> ignore
          |> Js.Promise.resolve
        )
+    |> ignore
   );
 
 let toPromise = future =>

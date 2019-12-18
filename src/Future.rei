@@ -1,7 +1,7 @@
 type getFn('a) = ('a => unit) => unit;
 type executorType = [ `none | `trampoline ];
 type t('a);
-let make: (~executor: executorType=?, ('a => unit) => 'b) => t('a);
+let make: (~executor: executorType=?, getFn('a)) => t('a);
 let value: (~executor: executorType=?, 'a) => t('a);
 let map: (t('a), 'a => 'b) => t('b);
 let flatMap: (t('a), 'a => t('b)) => t('b);
@@ -37,9 +37,9 @@ let mapOk5:
   t(Belt.Result.t('d, 'b)), t(Belt.Result.t('e, 'b)),
   t(Belt.Result.t('f, 'b)), ('a, 'c, 'd, 'e, 'f) => 'g) =>
   t(Belt.Result.t('g, 'b));
-let tapOk: (t(Belt.Result.t('a, 'b)), 'a => 'c) => t(Belt.Result.t('a, 'b));
+let tapOk: (t(Belt.Result.t('a, 'b)), 'a => unit) => t(Belt.Result.t('a, 'b));
 let tapError:
-  (t(Belt.Result.t('a, 'b)), 'b => 'c) => t(Belt.Result.t('a, 'b));
+  (t(Belt.Result.t('a, 'b)), 'b => unit) => t(Belt.Result.t('a, 'b));
 let ( >>= ):
   (t(Belt.Result.t('a, 'b)), 'a => t(Belt.Result.t('c, 'b))) =>
   t(Belt.Result.t('c, 'b));
