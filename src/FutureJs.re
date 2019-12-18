@@ -33,12 +33,10 @@ let toPromise = future =>
     future->Future.get(value => resolve(. value))
   );
 
-exception FutureError;
-
-let resultToPromise = future =>
+let resultToPromise = (future, errorTransformer) =>
   Js.Promise.make((~resolve, ~reject) =>
     future
-    ->Future.mapError(_ => FutureError)
+    ->Future.mapError(errorTransformer)
     ->Future.map(result =>
         switch (result) {
         | Belt.Result.Ok(result) => resolve(. result)

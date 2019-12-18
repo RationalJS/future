@@ -98,7 +98,7 @@ describe("FutureJs", () => {
 
   testPromise("resultToPromise (Ok result)", () =>
     delay(5, () => Belt.Result.Ok("payload"))
-    |> FutureJs.resultToPromise
+    |> FutureJs.resultToPromise(_, x => TestError(Js.String.make(x)))
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
     |> Js.Promise.then_(x =>
          Js.Promise.resolve(x |> expect |> toEqual("payload"))
@@ -108,11 +108,11 @@ describe("FutureJs", () => {
   testPromise("resultToPromise (Error exn)", () => {
     let err = TestError("error!");
     delay(5, () => Belt.Result.Error(err))
-    |> FutureJs.resultToPromise
+    |> FutureJs.resultToPromise(_, x => x)
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.catch(_ =>
+    |> Js.Promise.catch(x =>
          Js.Promise.resolve(
-           pass // Going from Future to Js.Promise loses information...
+           Js.String.make(x) |> expect |> toEqual(Js.String.make(err))
          )
        );
   });
@@ -120,11 +120,11 @@ describe("FutureJs", () => {
   testPromise("resultToPromise (Error `PolymorphicVariant)", () => {
     let err = `TestError;
     delay(5, () => Belt.Result.Error(err))
-    |> FutureJs.resultToPromise
+    |> FutureJs.resultToPromise(_, x => TestError(Js.String.make(x)))
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.catch(_ =>
+    |> Js.Promise.catch(x =>
          Js.Promise.resolve(
-           pass // Going from Future to Js.Promise loses information...
+           Js.String.make(x) |> expect |> toMatchRe(Js.Re.fromString("^.*" ++ Js.String.make(err) ++ "$"))
          )
        );
   });

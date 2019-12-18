@@ -121,9 +121,13 @@ Convenience functions for interop with JavaScript land.
 - `FutureJs.toPromise(future)`
   - `future` is any `Future.t('a)` which is transformed into a
     `Js.Promise.t('a)`. Always resolves, never rejects the promise.
-- `FutureJs.resultToPromise(future)`
+- `FutureJs.resultToPromise(future, errorTransformer)`
   - `future` is the `Future.t(Belt.Result('a, 'e))` which is transformed into a
     `Js.Promise.t('a)`. Resolves the promise on Ok result and rejects on Error result.
+  - `errorTransformer` allows you to determine how `Belt.Result.Error` (of 'b) type
+    objects will be transformed before they are returned wrapped within
+    a `Js.Promise.t`.  This allows you to implement the error handling
+    method which best meets your application's needs.
 
 Example use:
 
