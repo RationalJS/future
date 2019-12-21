@@ -137,8 +137,8 @@ let handleError = Js.String.make;
 
 somePromiseGetter()
 ->FutureJs.fromPromise(handleError)
-->Future.map(value => Js.log2("It worked!", value))
-->Future.mapError(err => Js.log2("uh on", err));
+->Future.tap(value => Js.log2("It worked!", value))
+->Future.tapError(err => Js.log2("uh on", err));
 ```
 
 See [Composible Error Handling in OCaml][error-handling] for several strategies that you may employ.
