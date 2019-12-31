@@ -1,17 +1,47 @@
 type getFn('a) = ('a => unit) => unit;
 
-type t('a) =
-  | Future(getFn('a));
+type executorType = [ | `none | `trampoline];
 
-let make = resolver => {
+type t('a) =
+  | Future(getFn('a), executorType);
+
+let trampoline = {
+  let running = ref(false);
+  let callbacks = [||];
+  let rec runLoop = callback => {
+    callback();
+    switch (Js.Array.pop(callbacks)) {
+    | None => ()
+    | Some(callback) => runLoop(callback)
+    };
+  };
+  callback =>
+    if (running^) {
+      Js.Array.unshift(callback, callbacks) |> ignore;
+    } else {
+      running := true;
+      runLoop(callback);
+      running := false;
+    };
+};
+
+let make = (~executor: executorType=`none, resolver) => {
   let callbacks = ref([]);
   let data = ref(None);
+
+  let runCallback =
+    switch (executor) {
+    | `none => ((result, cb) => cb(result))
+    | `trampoline => ((result, cb) => trampoline(() => cb(result)))
+    };
 
   resolver(result =>
     switch (data^) {
     | None =>
       data := Some(result);
-      (callbacks^)->Belt.List.reverse->Belt.List.forEach(cb => cb(result));
+      (callbacks^)
+      ->Belt.List.reverse
+      ->Belt.List.forEach(runCallback(result));
       /* Clean up memory usage */
       callbacks := [];
     | Some(_) => () /* Do nothing; theoretically not possible */
@@ -21,21 +51,23 @@ let make = resolver => {
   Future(
     resolve =>
       switch (data^) {
-      | Some(result) => resolve(result)
+      | Some(result) => runCallback(result, resolve)
       | None => callbacks := [resolve, ...callbacks^]
       },
+    executor,
   );
 };
 
-let value = x => make(resolve => resolve(x));
+let value = (~executor: executorType=`none, x) =>
+  make(~executor, resolve => resolve(x));
 
-let map = (Future(get), f) =>
-  make(resolve => get(result => resolve(f(result))));
+let map = (Future(get, executor), f) =>
+  make(~executor, resolve => get(result => resolve(f(result))));
 
-let flatMap = (Future(get), f) =>
-  make(resolve =>
+let flatMap = (Future(get, executor), f) =>
+  make(~executor, resolve =>
     get(result => {
-      let Future(get2) = f(result);
+      let Future(get2, _) = f(result);
       get2(resolve);
     })
   );
@@ -59,12 +91,12 @@ let rec all = futures =>
   | [] => value([])
   };
 
-let tap = (Future(get) as future, f) => {
+let tap = (Future(get, _) as future, f) => {
   get(f);
   future;
 };
 
-let get = (Future(getFn), f) => getFn(f);
+let get = (Future(getFn, _), f) => getFn(f);
 
 /* *
  * Future Belt.Result convenience functions,
