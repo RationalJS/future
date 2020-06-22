@@ -40,6 +40,8 @@ let mapOk5:
 let tapOk: (t(Belt.Result.t('a, 'b)), 'a => 'c) => t(Belt.Result.t('a, 'b));
 let tapError:
   (t(Belt.Result.t('a, 'b)), 'b => 'c) => t(Belt.Result.t('a, 'b));
+let delay: (~executor: executorType=?, int, unit => 'a) => t('a);
+let sleep: (~executor: executorType=?, int) => t(unit);
 let ( >>= ):
   (t(Belt.Result.t('a, 'b)), 'a => t(Belt.Result.t('c, 'b))) =>
   t(Belt.Result.t('c, 'b));
