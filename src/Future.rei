@@ -19,6 +19,9 @@ let mapError:
 let flatMapOk:
   (t(Belt.Result.t('a, 'b)), 'a => t(Belt.Result.t('c, 'b))) =>
   t(Belt.Result.t('c, 'b));
+let flatMapOkPure:
+  (t(Belt.Result.t('a, 'b)), 'a => Belt.Result.t('c, 'b)) =>
+  t(Belt.Result.t('c, 'b));
 let flatMapError:
   (t(Belt.Result.t('a, 'b)), 'b => t(Belt.Result.t('a, 'c))) =>
   t(Belt.Result.t('a, 'c));
@@ -44,5 +47,8 @@ let delay: (~executor: executorType=?, int, unit => 'a) => t('a);
 let sleep: (~executor: executorType=?, int) => t(unit);
 let ( >>= ):
   (t(Belt.Result.t('a, 'b)), 'a => t(Belt.Result.t('c, 'b))) =>
+  t(Belt.Result.t('c, 'b));
+let ( >>== ):
+  (t(Belt.Result.t('a, 'b)), 'a => Belt.Result.t('c, 'b)) =>
   t(Belt.Result.t('c, 'b));
 let ( <$> ): (t(Belt.Result.t('a, 'b)), 'a => 'c) => t(Belt.Result.t('c, 'b));
