@@ -69,7 +69,9 @@ describe("Future", () => {
   testAsync("multiple gets (async)", finish => {
     let count = ref(0);
     let future =
-      Future.delay(25, () => 0)->Future.map(_ => count := count^ + 1);
+      Future.sleep(25)
+      ->Future.map(() => 0)
+      ->Future.map(_ => count := count^ + 1);
 
     future->Future.get(_
       //Runs after previous future
@@ -87,11 +89,18 @@ describe("Future", () => {
   });
 
   testAsync("all (async)", finish =>
-    Future.(all([value(1), delay(25, () => 2), delay(50, () => 3)]))
+    Future.(
+      all([
+        value(1),
+        delay(25, () => 2),
+        delay(50, () => 3),
+        sleep(75)->map(() => 4),
+      ])
+    )
     ->Future.get(result =>
         switch (result) {
-        | [1, 2, 3] => pass |> finish
-        | _ => fail("Expected [1, 2, 3]") |> finish
+        | [1, 2, 3, 4] => pass |> finish
+        | _ => fail("Expected [1, 2, 3, 4]") |> finish
         }
       )
   );
