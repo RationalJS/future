@@ -464,4 +464,21 @@ describe("Future cancellation", () => {
     )
     |> ignore;
   });
+  test("Dismisses callbacks for already cancelled Future", () => {
+    let counter = ref(0);
+    let future = Future.make(_resolve => None);
+    future->Future.cancel;
+    future->Future.get(_ => incr(counter));
+    expect(counter.contents) |> toBe(0);
+  });
+  test("Cancel doesn't get called after resolve", () => {
+    let counter = ref(0);
+    let future =
+      Future.make(resolve => {
+        resolve(0);
+        Some(() => incr(counter));
+      });
+    future->Future.cancel;
+    expect(counter.contents) |> toBe(0);
+  });
 });

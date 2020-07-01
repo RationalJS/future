@@ -86,7 +86,7 @@ let make =
 };
 
 let cancel = (Future(getFunc, _)) => {
-  let Cancel(cancel) = getFunc(_ => ());
+  let Cancel(cancel) = getFunc(noop);
   cancel();
 };
 
