@@ -46,7 +46,8 @@ let make = (~executor: executorType=`none, resolver) => {
       callbacks := [];
     | Some(_) => () /* Do nothing; theoretically not possible */
     }
-  );
+  )
+  ->ignore;
 
   Future(
     resolve =>
