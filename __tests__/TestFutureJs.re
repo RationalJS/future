@@ -1,6 +1,7 @@
-open TestUtil;
 open Jest;
 open Expect;
+
+exception TestError(string);
 
 describe("FutureJs", () => {
   let errorTransformer = x => x;
@@ -88,7 +89,7 @@ describe("FutureJs", () => {
       );
   });
   testPromise("toPromise", () =>
-    delay(5, () => "payload")
+    Future.delay(5, () => "payload")
     |> FutureJs.toPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
     |> Js.Promise.then_(x =>
@@ -97,7 +98,7 @@ describe("FutureJs", () => {
   );
 
   testPromise("resultToPromise (Ok result)", () =>
-    delay(5, () => Belt.Result.Ok("payload"))
+    Future.delay(5, () => Belt.Result.Ok("payload"))
     |> FutureJs.resultToPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
     |> Js.Promise.then_(x =>
@@ -107,7 +108,7 @@ describe("FutureJs", () => {
 
   testPromise("resultToPromise (Error exn)", () => {
     let err = TestError("error!");
-    delay(5, () => Belt.Result.Error(err))
+    Future.delay(5, () => Belt.Result.Error(err))
     |> FutureJs.resultToPromise
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
     |> Js.Promise.catch(_ =>
@@ -119,7 +120,7 @@ describe("FutureJs", () => {
 
   testPromise("resultToPromise (Error `PolymorphicVariant)", () => {
     let err = `TestError;
-    delay(5, () => Belt.Result.Error(err))
+    Future.delay(5, () => Belt.Result.Error(err))
     |> FutureJs.resultToPromise
     |> Js.Promise.then_(_ => raise(TestError("shouldn't be possible")))
     |> Js.Promise.catch(_ =>

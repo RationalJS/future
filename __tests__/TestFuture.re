@@ -1,8 +1,6 @@
 open Jest;
 open Expect;
 
-open TestUtil;
-
 describe("Future", () => {
   testAsync("sync chaining", finish =>
     Future.value("one")
@@ -11,7 +9,7 @@ describe("Future", () => {
   );
 
   testAsync("async chaining", finish =>
-    delay(25, () => 20)
+    Future.delay(25, () => 20)
     ->Future.map(s => string_of_int(s))
     ->Future.map(s => s ++ "!")
     ->Future.get(s => s |> expect |> toEqual("20!") |> finish)
@@ -33,7 +31,7 @@ describe("Future", () => {
   );
 
   testAsync("map2", finish =>
-    Future.map2(delay(20, () => 1), Future.value("a"), (num, str) =>
+    Future.map2(Future.delay(20, () => 1), Future.value("a"), (num, str) =>
       (num, str)
     )
     ->Future.get(tup => tup |> expect |> toEqual((1, "a")) |> finish)
@@ -41,11 +39,11 @@ describe("Future", () => {
 
   testAsync("map5", finish =>
     Future.map5(
-      delay(20, () => 0),
-      delay(40, () => 1.2),
-      delay(60, () => "foo"),
-      delay(80, () => []),
-      delay(100, () => ()),
+      Future.delay(20, () => 0),
+      Future.delay(40, () => 1.2),
+      Future.delay(60, () => "foo"),
+      Future.delay(80, () => []),
+      Future.delay(100, () => ()),
       (a, b, c, d, e) =>
       (a, b, c, d, e)
     )
@@ -70,7 +68,10 @@ describe("Future", () => {
 
   testAsync("multiple gets (async)", finish => {
     let count = ref(0);
-    let future = delay(25, () => 0)->Future.map(_ => count := count^ + 1);
+    let future =
+      Future.sleep(25)
+      ->Future.map(() => 0)
+      ->Future.map(_ => count := count^ + 1);
 
     future->Future.get(_
       //Runs after previous future
@@ -88,11 +89,18 @@ describe("Future", () => {
   });
 
   testAsync("all (async)", finish =>
-    Future.all([Future.value(1), delay(25, () => 2), delay(50, () => 3)])
+    Future.(
+      all([
+        value(1),
+        delay(25, () => 2),
+        delay(50, () => 3),
+        sleep(75)->map(() => 4),
+      ])
+    )
     ->Future.get(result =>
         switch (result) {
-        | [1, 2, 3] => pass |> finish
-        | _ => fail("Expected [1, 2, 3]") |> finish
+        | [1, 2, 3, 4] => pass |> finish
+        | _ => fail("Expected [1, 2, 3, 4]") |> finish
         }
       )
   );
@@ -219,10 +227,10 @@ describe("Future Belt.Result", () => {
   testAsync("mapOk5 fails on first error", finish =>
     Future.mapOk5(
       Future.value(Belt.Result.Ok(0)),
-      delay(20, () => Belt.Result.Ok(1.)),
-      delay(10, () => Belt.Result.Error("first")),
+      Future.delay(20, () => Belt.Result.Ok(1.)),
+      Future.delay(10, () => Belt.Result.Error("first")),
       Future.value(Belt.Result.Ok("")),
-      delay(100, () => Belt.Result.Error("second")),
+      Future.delay(100, () => Belt.Result.Error("second")),
       (_, _, _, _, _) =>
       None
     )
@@ -337,7 +345,7 @@ describe("Future Belt.Result", () => {
   });
 
   testAsync("async recursion is stack safe", finish => {
-    let next = x => delay(~executor=`trampoline, 1, () => x + 1);
+    let next = x => Future.delay(~executor=`trampoline, 1, () => x + 1);
     let numberOfLoops = 1000;
     let rec loop = x => {
       next(x)

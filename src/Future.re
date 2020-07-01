@@ -154,5 +154,12 @@ let tapError = (future, f) =>
     }
   );
 
+let delay = (~executor=?, ms, f) =>
+  make(~executor?, resolve =>
+    Js.Global.setTimeout(() => f() |> resolve, ms)->ignore
+  );
+
+let sleep = (~executor=?, ms) => delay(~executor?, ms, () => ());
+
 let (>>=) = flatMapOk;
 let (<$>) = mapOk;
