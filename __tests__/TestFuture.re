@@ -58,6 +58,7 @@ describe("Future", () => {
       Future.make(resolve => {
         count := count^ + 1;
         resolve(count^);
+        None;
       });
 
     future->Future.get(_ => ());
@@ -378,5 +379,89 @@ describe("Future Belt.Result", () => {
       loop(0)
     )
     |> toThrowMessage("Maximum call stack size exceeded");
+  });
+});
+
+describe("Future cancellation", () => {
+  testAsync("Future can be cancelled", callback => {
+    let future = Future.delay(50, _ => ());
+    let counter = ref(0);
+    future->Future.tap(() => incr(counter))->ignore;
+    Future.cancel(future);
+    Js.Global.setTimeout(
+      () => callback(expect(counter.contents) |> toBe(0)),
+      100,
+    )
+    |> ignore;
+  });
+
+  testAsync("Future can be cancelled through map and flatMap", callback => {
+    let future = Future.delay(50, _ => 1);
+    let counter1 = ref(0);
+    let counter2 = ref(0);
+    let counter3 = ref(0);
+    let finalFuture =
+      future
+      ->Future.tap(_ => incr(counter1))
+      ->Future.map(x => x + 1)
+      ->Future.tap(_ => incr(counter2))
+      ->Future.flatMap(x => Future.value(x + 1))
+      ->Future.tap(_ => incr(counter3));
+    Future.cancel(finalFuture);
+    Js.Global.setTimeout(
+      () =>
+        callback(
+          expect((counter1.contents, counter2.contents, counter3.contents))
+          |> toEqual((0, 0, 0)),
+        ),
+      100,
+    )
+    |> ignore;
+  });
+  testAsync("Future can stop propagating in flatMap", callback => {
+    let future = Future.delay(50, _ => 1);
+    let counter1 = ref(0);
+    let counter2 = ref(0);
+    let counter3 = ref(0);
+    let finalFuture =
+      future
+      ->Future.tap(_ => incr(counter1))
+      ->Future.map(x => x + 1)
+      ->Future.tap(_ => incr(counter2))
+      ->Future.flatMap(~propagateCancel=false, x => Future.value(x + 1))
+      ->Future.tap(_ => incr(counter3));
+    Future.cancel(finalFuture);
+    Js.Global.setTimeout(
+      () =>
+        callback(
+          expect((counter1.contents, counter2.contents, counter3.contents))
+          |> toEqual((1, 1, 0)),
+        ),
+      100,
+    )
+    |> ignore;
+  });
+  testAsync("Future can stop propagating in map", callback => {
+    let future = Future.delay(50, _ => 1);
+    let counter1 = ref(0);
+    let counter2 = ref(0);
+    let counter3 = ref(0);
+    let finalFuture =
+      future
+      ->Future.tap(_ => incr(counter1))
+      ->Future.map(~propagateCancel=false, x => x + 1)
+      ->Future.tap(_ => incr(counter2))
+      ->Future.flatMap(x => Future.value(x + 1))
+      ->Future.tap(_ => incr(counter3));
+    Future.cancel(finalFuture);
+    Js.Global.setTimeout(
+      () =>
+        callback(
+          expect((counter1.contents, counter2.contents, counter3.contents))
+          |> toEqual((1, 0, 0)),
+        ),
+      100,
+    )
+    |> ignore;
   });
 });

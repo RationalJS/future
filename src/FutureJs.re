@@ -14,7 +14,7 @@
 *    ```
  */
 let fromPromise = (promise, errorTransformer) =>
-  Future.make(callback =>
+  Future.make(callback => {
     promise
     |> Js.Promise.then_(res =>
          Belt.Result.Ok(res) |> callback |> ignore |> Js.Promise.resolve
@@ -26,7 +26,9 @@ let fromPromise = (promise, errorTransformer) =>
          |> ignore
          |> Js.Promise.resolve
        )
-  );
+    |> ignore;
+    None;
+  });
 
 let toPromise = future =>
   Js.Promise.make((~resolve, ~reject as _) =>

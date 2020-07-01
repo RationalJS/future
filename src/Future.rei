@@ -1,15 +1,16 @@
 type getFn('a) = ('a => unit) => unit;
 type executorType = [ `none | `trampoline ];
 type t('a);
-let make: (~executor: executorType=?, ('a => unit) => 'b) => t('a);
+let make: (~executor: executorType=?, ('a => unit) => option(unit => unit)) => t('a);
 let value: (~executor: executorType=?, 'a) => t('a);
-let map: (t('a), 'a => 'b) => t('b);
-let flatMap: (t('a), 'a => t('b)) => t('b);
-let map2: (t('a), t('b), ('a, 'b) => 'c) => t('c);
-let map3: (t('a), t('b), t('c), ('a, 'b, 'c) => 'd) => t('d);
-let map4: (t('a), t('b), t('c), t('d), ('a, 'b, 'c, 'd) => 'e) => t('e);
+let cancel: (t('a)) => unit;
+let map: (t('a), ~propagateCancel: bool=?, 'a => 'b) => t('b);
+let flatMap: (t('a), ~propagateCancel: bool=?, 'a => t('b)) => t('b);
+let map2: (t('a), t('b), ~propagateCancel: bool=?, ('a, 'b) => 'c) => t('c);
+let map3: (t('a), t('b),  t('c), ~propagateCancel: bool=?, ('a, 'b, 'c) => 'd) => t('d);
+let map4: (t('a), t('b), t('c), t('d), ~propagateCancel: bool=?, ('a, 'b, 'c, 'd) => 'e) => t('e);
 let map5:
-  (t('a), t('b), t('c), t('d), t('e), ('a, 'b, 'c, 'd, 'e) => 'f) => t('f);
+  (t('a), t('b), t('c), t('d), t('e), ~propagateCancel: bool=?, ('a, 'b, 'c, 'd, 'e) => 'f) => t('f);
 let all: list(t('a)) => t(list('a));
 let tap: (t('a), 'a => unit) => t('a);
 let get: (t('a), 'a => unit) => unit;

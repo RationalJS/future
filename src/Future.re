@@ -2,8 +2,28 @@ type getFn('a) = ('a => unit) => unit;
 
 type executorType = [ | `none | `trampoline];
 
-type t('a) =
-  | Future(getFn('a), executorType);
+type status('value) =
+  | Pending(array('value => unit))
+  | Cancelled
+  | Done('value);
+
+[@unboxed]
+type cancellationToken =
+  | Cancel(unit => unit);
+
+type cancelFunction = unit => unit;
+
+type futureCallback('value) = 'value => unit;
+
+type resolve('value) = 'value => unit;
+
+type setup('value) = resolve('value) => option(cancelFunction);
+
+[@unboxed]
+type t('value) =
+  | Future(futureCallback('value) => cancellationToken, executorType);
+
+let noop = _ => ();
 
 let trampoline = {
   let running = ref(false);
@@ -25,61 +45,106 @@ let trampoline = {
     };
 };
 
-let make = (~executor: executorType=`none, resolver) => {
-  let callbacks = ref([]);
-  let data = ref(None);
-
+let make =
+    (~executor: executorType=`none, resolver: setup('value)): t('value) => {
+  let status = ref(Pending([||]));
   let runCallback =
     switch (executor) {
     | `none => ((result, cb) => cb(result))
     | `trampoline => ((result, cb) => trampoline(() => cb(result)))
     };
+  let maybeCancel =
+    resolver(value =>
+      switch (status.contents) {
+      | Pending(subscriptions) =>
+        status := Done(value);
+        subscriptions->Js.Array2.forEach(cb => runCallback(value, cb));
+      | Cancelled
+      | Done(_) => ()
+      }
+    );
+  let futureGet = cb => {
+    switch (status.contents) {
+    | Done(value) =>
+      runCallback(value, cb);
+      Cancel(noop);
+    | Cancelled => Cancel(noop)
+    | Pending(subscriptions) =>
+      let _ = subscriptions->Js.Array2.push(cb);
+      Cancel(
+        () => {
+          switch (maybeCancel) {
+          | Some(cancel) => cancel()
+          | None => ()
+          };
+          status := Cancelled;
+        },
+      );
+    };
+  };
+  Future(futureGet, executor);
+};
 
-  resolver(result =>
-    switch (data^) {
-    | None =>
-      data := Some(result);
-      (callbacks^)
-      ->Belt.List.reverse
-      ->Belt.List.forEach(runCallback(result));
-      /* Clean up memory usage */
-      callbacks := [];
-    | Some(_) => () /* Do nothing; theoretically not possible */
-    }
-  );
-
-  Future(
-    resolve =>
-      switch (data^) {
-      | Some(result) => runCallback(result, resolve)
-      | None => callbacks := [resolve, ...callbacks^]
-      },
-    executor,
-  );
+let cancel = (Future(getFunc, _)) => {
+  let Cancel(cancel) = getFunc(_ => ());
+  cancel();
 };
 
 let value = (~executor: executorType=`none, x) =>
-  make(~executor, resolve => resolve(x));
-
-let map = (Future(get, executor), f) =>
-  make(~executor, resolve => get(result => resolve(f(result))));
-
-let flatMap = (Future(get, executor), f) =>
-  make(~executor, resolve =>
-    get(result => {
-      let Future(get2, _) = f(result);
-      get2(resolve);
-    })
+  make(
+    ~executor,
+    resolve => {
+      resolve(x);
+      None;
+    },
   );
 
-let map2 = (fa, fb, f) => flatMap(fa, a => map(fb, b => f(a, b)));
+let map = (Future(get, executor), ~propagateCancel=true, f) =>
+  make(
+    ~executor,
+    resolve => {
+      let Cancel(cancel) = get(value => resolve(f(value)));
+      if (propagateCancel) {
+        Some(() => cancel());
+      } else {
+        None;
+      };
+    },
+  );
 
-let map3 = (fa, fb, fc, f) => map2(map2(fa, fb, f), fc, v => v);
+let flatMap = (Future(get, executor), ~propagateCancel=true, f) =>
+  make(
+    ~executor,
+    resolve => {
+      let Cancel(cancel) =
+        get(val1 => {
+          let Future(get2, _) = f(val1);
+          let _ = get2(val2 => resolve(val2));
+          ();
+        });
+      if (propagateCancel) {
+        Some(() => cancel());
+      } else {
+        None;
+      };
+    },
+  );
 
-let map4 = (fa, fb, fc, fd, f) => map3(map2(fa, fb, f), fc, fd, v => v);
+let map2 = (fa, fb, ~propagateCancel=?, f) =>
+  flatMap(fa, ~propagateCancel?, a =>
+    map(fb, ~propagateCancel?, b => f(a, b))
+  );
 
-let map5 = (fa, fb, fc, fd, fe, f) =>
-  map4(map2(fa, fb, f), fc, fd, fe, v => v);
+let map3 = (fa, fb, fc, ~propagateCancel=?, f) =>
+  map2(map2(fa, fb, ~propagateCancel?, f), fc, ~propagateCancel?, v => v);
+
+let map4 = (fa, fb, fc, fd, ~propagateCancel=?, f) =>
+  map3(map2(fa, fb, ~propagateCancel?, f), fc, fd, ~propagateCancel?, v => v);
+
+let map5 = (fa, fb, fc, fd, fe, ~propagateCancel=?, f) =>
+  map4(map2(fa, fb, ~propagateCancel?, f), fc, fd, fe, ~propagateCancel?, v =>
+    v
+  );
 
 let rec all = futures =>
   switch (futures) {
@@ -92,11 +157,14 @@ let rec all = futures =>
   };
 
 let tap = (Future(get, _) as future, f) => {
-  get(f);
+  let _ = get(f);
   future;
 };
 
-let get = (Future(getFn, _), f) => getFn(f);
+let get = (Future(getFn, _), f) => {
+  let _ = getFn(f);
+  ();
+};
 
 /* *
  * Future Belt.Result convenience functions,
@@ -155,8 +223,12 @@ let tapError = (future, f) =>
   );
 
 let delay = (~executor=?, ms, f) =>
-  make(~executor?, resolve =>
-    Js.Global.setTimeout(() => f() |> resolve, ms)->ignore
+  make(
+    ~executor?,
+    resolve => {
+      let timeoutId = Js.Global.setTimeout(() => f() |> resolve, ms);
+      Some(() => Js.Global.clearTimeout(timeoutId));
+    },
   );
 
 let sleep = (~executor=?, ms) => delay(~executor?, ms, () => ());
