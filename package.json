@@ -1,6 +1,6 @@
 {
   "name": "reason-future",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "scripts": {
     "build": "bsb -make-world",
     "start": "bsb -make-world -w",
@@ -21,9 +21,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@glennsl/bs-jest": "0.4.8",
-    "bs-platform": "5.0.6",
-    "coveralls": "3.0.5"
+    "@glennsl/bs-jest": "0.5.1",
+    "bs-platform": "8.0.3",
+    "coveralls": "3.1.0"
   },
   "description": "A Js.Promise alternative for ReasonML.",
   "main": "index.js",
