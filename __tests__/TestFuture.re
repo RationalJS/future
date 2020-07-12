@@ -184,6 +184,27 @@ describe("Future Belt.Result", () => {
       )
   );
 
+  testAsync("flatMapOkPure 1", finish =>
+    Belt.Result.Ok("four")
+    ->Future.value
+    ->Future.flatMapOkPure(s => Belt.Result.Ok(s ++ "!"))
+    ->Future.get(r =>
+        Belt.Result.getExn(r) |> expect |> toEqual("four!") |> finish
+      )
+  );
+
+  testAsync("flatMapOkPure 2", finish =>
+    Belt.Result.Error("err4.1")
+    ->Future.value
+    ->Future.flatMapOkPure(s => Belt.Result.Ok(s ++ "!"))
+    ->Future.get(r =>
+        switch (r) {
+        | Ok(_) => fail("shouldn't be possible") |> finish
+        | Error(e) => e |> expect |> toEqual("err4.1") |> finish
+        }
+      )
+  );
+
   testAsync("flatMapError 1", finish =>
     Belt.Result.Ok("five")
     ->Future.value

@@ -121,6 +121,8 @@ let flatMapOk = (future, f) =>
     }
   );
 
+let flatMapOkPure = (fut, f) => fut->flatMapOk(result => value(result->f));
+
 let flatMapError = (future, f) =>
   future->flatMap(r =>
     switch (r) {
@@ -163,4 +165,5 @@ let delay = (~executor=?, ms, f) =>
 let sleep = (~executor=?, ms) => delay(~executor?, ms, () => ());
 
 let (>>=) = flatMapOk;
+let (>>==) = flatMapOkPure;
 let (<$>) = mapOk;
