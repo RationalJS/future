@@ -2,16 +2,16 @@
   "name": "reason-future",
   "version": "2.6.0",
   "scripts": {
-    "build": "bsb -make-world",
-    "start": "bsb -make-world -w",
-    "clean": "bsb -clean-world",
+    "build": "rescript build -with-deps",
+    "start": "rescript build -with-deps -w",
+    "clean": "rescript clean -with-deps",
     "test": "yarn clean ; yarn build; jest --coverage --coverageReporters=text-lcov | coveralls",
     "test:only": "yarn jest"
   },
   "files": [
-    "src/Future.re",
-    "src/FutureResult.re",
-    "src/FutureJs.re",
+    "src/Future.res",
+    "src/FutureResult.res",
+    "src/FutureJs.res",
     "bsconfig.json",
     "README.md"
   ],
@@ -22,14 +22,14 @@
   "license": "MIT",
   "devDependencies": {
     "@glennsl/bs-jest": "0.5.1",
-    "bs-platform": "8.0.3",
-    "coveralls": "3.1.0"
+    "coveralls": "3.1.0",
+    "rescript": "9.1.4"
   },
   "description": "A Js.Promise alternative for ReasonML.",
   "main": "index.js",
   "dependencies": {},
   "peerDependencies": {
-    "bs-platform": ">= 3.1.0"
+    "rescript": "^9.1.4"
   },
   "repository": {
     "type": "git",
