@@ -15,18 +15,10 @@ let tap: (t<'a>, 'a => unit) => t<'a>
 let get: (t<'a>, 'a => unit) => unit
 let mapOk: (t<result<'a, 'b>>, 'a => 'c) => t<result<'c, 'b>>
 let mapError: (t<result<'a, 'b>>, 'b => 'c) => t<result<'a, 'c>>
-let flatMapOk: (t<result<'a, 'b>>, 'a => t<result<'c, 'b>>) => t<
-  result<'c, 'b>,
->
-let flatMapOkPure: (t<result<'a, 'b>>, 'a => result<'c, 'b>) => t<
-  result<'c, 'b>,
->
-let flatMapError: (t<result<'a, 'b>>, 'b => t<result<'a, 'c>>) => t<
-  result<'a, 'c>,
->
-let mapOk2: (t<result<'a, 'b>>, t<result<'c, 'b>>, ('a, 'c) => 'd) => t<
-  result<'d, 'b>,
->
+let flatMapOk: (t<result<'a, 'b>>, 'a => t<result<'c, 'b>>) => t<result<'c, 'b>>
+let flatMapOkPure: (t<result<'a, 'b>>, 'a => result<'c, 'b>) => t<result<'c, 'b>>
+let flatMapError: (t<result<'a, 'b>>, 'b => t<result<'a, 'c>>) => t<result<'a, 'c>>
+let mapOk2: (t<result<'a, 'b>>, t<result<'c, 'b>>, ('a, 'c) => 'd) => t<result<'d, 'b>>
 let mapOk3: (
   t<result<'a, 'b>>,
   t<result<'c, 'b>>,

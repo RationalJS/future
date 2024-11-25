@@ -112,18 +112,18 @@ a future `Result`. Flattens the inner future.
 Convenience functions for interop with JavaScript land.
 
 - `FutureJs.fromPromise(promise, errorTransformer)`
-  - `promise` is the `Js.Promise.t('a)` that will be transformed into a
+  - `promise` is the `RescriptCore.Promise.t('a)` that will be transformed into a
     `Future.t(result('a, 'e))`
-  - `errorTransformer` allows you to determine how `Js.Promise.error`
+  - `errorTransformer` allows you to determine how `Promise.error`
     objects will be transformed before they are returned wrapped within
     a `Error`.  This allows you to implement the error handling
     method which best meets your application's needs.
 - `FutureJs.toPromise(future)`
   - `future` is any `Future.t('a)` which is transformed into a
-    `Js.Promise.t('a)`. Always resolves, never rejects the promise.
+    `RescriptCore.Promise.t('a)`. Always resolves, never rejects the promise.
 - `FutureJs.resultToPromise(future)`
   - `future` is the `Future.t(result('a, 'e))` which is transformed into a
-    `Js.Promise.t('a)`. Resolves the promise on Ok result and rejects on Error result.
+    `RescriptCore.Promise.t('a)`. Resolves the promise on Ok result and rejects on Error result.
 
 Example use:
 

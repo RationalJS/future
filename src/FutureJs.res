@@ -1,12 +1,12 @@
 @ocaml.doc("
  * Translate a Js.Promise to a Future(result)
  *
- * errorTransformer: (Js.Promise.error) => 'a
- * - The errorTransformer will provide you with the raw Js.Promise.error
+ * errorTransformer: (Promise.error) => 'a
+ * - The errorTransformer will provide you with the raw Promise.error
  *   object.  This is done so that you may decide on the appropriate error
  *   handling scheme for your application.
  *   See: http://keleshev.com/composable-error-handling-in-ocaml
- * - A good start is translating the Js.Promise.error to a string.
+ * - A good start is translating the Promise.error to a string.
  *   ```reason
  *   let errorTransformer = (error) =>
  *     Js.String.make(error)
@@ -16,29 +16,26 @@
 let fromPromise = (promise, errorTransformer) =>
   Future.make(callback =>
     promise
-    |> Js.Promise.then_(res => Ok(res) |> callback |> ignore |> Js.Promise.resolve)
-    |> Js.Promise.catch(error =>
-      errorTransformer(error)
-      |> (transformed => Error(transformed))
-      |> callback
-      |> ignore
-      |> Js.Promise.resolve
+    ->Promise.then(res => Promise.resolve(ignore(callback(Ok(res)))))
+    ->Promise.catch(error =>
+      Promise.resolve(
+        ignore(callback((transformed => Error(transformed))(errorTransformer(error)))),
+      )
     )
   )
 
-let toPromise = future =>
-  Js.Promise.make((~resolve, ~reject as _) => future->Future.get(value => resolve(. value)))
+let toPromise = future => Promise.make((resolve, _) => future->Future.get(value => resolve(value)))
 
 exception FutureError
 
 let resultToPromise = future =>
-  Js.Promise.make((~resolve, ~reject) =>
+  Promise.make((resolve, reject) =>
     future
     ->Future.mapError(_ => FutureError)
     ->Future.map(result =>
       switch result {
-      | Ok(result) => resolve(. result)
-      | Error(error) => reject(. error)
+      | Ok(result) => resolve(result)
+      | Error(error) => reject(error)
       }
     )
     ->ignore

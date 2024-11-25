@@ -156,7 +156,7 @@ let tapError = (future, f) =>
   )
 
 let delay = (~executor=?, ms, f) =>
-  make(~executor?, resolve => Js.Global.setTimeout(() => resolve(f()), ms)->ignore)
+  make(~executor?, resolve => setTimeout(() => resolve(f()), ms)->ignore)
 
 let sleep = (~executor=?, ms) => delay(~executor?, ms, () => ())
 
