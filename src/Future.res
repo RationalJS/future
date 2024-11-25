@@ -69,14 +69,11 @@ let flatMap = (Future(get, executor), f) =>
 
 let map2 = (fa, fb, f) => flatMap(fa, a => map(fb, b => f(a, b)))
 
-// let map3 = (fa, fb, fc, f) => map2(map2(fa, fb, f), fc, v => v)
 let map3 = (fa, fb, fc, f) => map2(map2(fa, fb, (a, b) => (a, b)), fc, ((a, b), c) => f(a, b, c))
 
-// let map4 = (fa, fb, fc, fd, f) => map3(map2(fa, fb, f), fc, fd, v => v)
 let map4 = (fa, fb, fc, fd, f) =>
   map2(map3(fa, fb, fc, (a, b, c) => (a, b, c)), fd, ((a, b, c), d) => f(a, b, c, d))
 
-// let map5 = (fa, fb, fc, fd, fe, f) => map4(map2(fa, fb, f), fc, fd, fe, v => v)
 let map5 = (fa, fb, fc, fd, fe, f) =>
   map2(map4(fa, fb, fc, fd, (a, b, c, d) => (a, b, c, d)), fe, ((a, b, c, d), e) =>
     f(a, b, c, d, e)
