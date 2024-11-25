@@ -37,7 +37,7 @@ let make = (~executor: executorType=#none, resolver) => {
     switch data.contents {
     | None =>
       data := Some(result)
-      callbacks.contents->Belt.List.reverse->Belt.List.forEach(cb => runCallback(result, cb))
+      callbacks.contents->List.reverse->List.forEach(cb => runCallback(result, cb))
       /* Clean up memory usage */
       callbacks := list{}
     | Some(_) => () /* Do nothing; theoretically not possible */
@@ -94,25 +94,25 @@ let tap = (Future(get, _) as future, f) => {
 let get = (Future(getFn, _), f) => getFn(f)
 
 /**
- * Future Belt.Result convenience functions,
- * for working with a type Future.t( Belt.Result.t('a,'b) )
+ * Future Result convenience functions,
+ * for working with a type Future.t( result('a,'b) )
  */
-let mapOk: (t<Belt.Result.t<'a, 'b>>, 'a => 'c) => t<Belt.Result.t<'c, 'b>> = (future, f) =>
-  future->map(r => Belt.Result.map(r, f))
+let mapOk: (t<result<'a, 'b>>, 'a => 'c) => t<result<'c, 'b>> = (future, f) =>
+  future->map(r => Result.map(r, f))
 
 let mapError = (future, f) =>
   future->map(r =>
     switch r {
-    | Belt.Result.Error(v) => Belt.Result.Error(f(v))
-    | Ok(a) => Belt.Result.Ok(a)
+    | Error(v) => Error(f(v))
+    | Ok(a) => Ok(a)
     }
   )
 
 let flatMapOk = (future, f) =>
   future->flatMap(r =>
     switch r {
-    | Belt.Result.Ok(v) => f(v)
-    | Belt.Result.Error(e) => value(Belt.Result.Error(e))
+    | Ok(v) => f(v)
+    | Error(e) => value(Error(e))
     }
   )
 
@@ -121,8 +121,8 @@ let flatMapOkPure = (fut, f) => fut->flatMapOk(result => value(result->f))
 let flatMapError = (future, f) =>
   future->flatMap(r =>
     switch r {
-    | Belt.Result.Ok(v) => value(Belt.Result.Ok(v))
-    | Belt.Result.Error(e) => f(e)
+    | Ok(v) => value(Ok(v))
+    | Error(e) => f(e)
     }
   )
 
@@ -142,7 +142,7 @@ let mapOk5 = (fa, fb, fc, fd, fe, f) =>
 let tapOk = (future, f) =>
   future->tap(r =>
     switch r {
-    | Belt.Result.Ok(v) => f(v)->ignore
+    | Ok(v) => f(v)->ignore
     | Error(_) => ()
     }
   )
@@ -150,7 +150,7 @@ let tapOk = (future, f) =>
 let tapError = (future, f) =>
   future->tap(r =>
     switch r {
-    | Belt.Result.Error(v) => f(v)->ignore
+    | Error(v) => f(v)->ignore
     | Ok(_) => ()
     }
   )

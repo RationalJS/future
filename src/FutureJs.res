@@ -1,5 +1,5 @@
 @ocaml.doc("
- * Translate a Js.Promise to a Future(Belt.Result.t)
+ * Translate a Js.Promise to a Future(result)
  *
  * errorTransformer: (Js.Promise.error) => 'a
  * - The errorTransformer will provide you with the raw Js.Promise.error
@@ -16,10 +16,10 @@
 let fromPromise = (promise, errorTransformer) =>
   Future.make(callback =>
     promise
-    |> Js.Promise.then_(res => Belt.Result.Ok(res) |> callback |> ignore |> Js.Promise.resolve)
+    |> Js.Promise.then_(res => Ok(res) |> callback |> ignore |> Js.Promise.resolve)
     |> Js.Promise.catch(error =>
       errorTransformer(error)
-      |> (transformed => Belt.Result.Error(transformed))
+      |> (transformed => Error(transformed))
       |> callback
       |> ignore
       |> Js.Promise.resolve
@@ -37,8 +37,8 @@ let resultToPromise = future =>
     ->Future.mapError(_ => FutureError)
     ->Future.map(result =>
       switch result {
-      | Belt.Result.Ok(result) => resolve(. result)
-      | Belt.Result.Error(error) => reject(. error)
+      | Ok(result) => resolve(. result)
+      | Error(error) => reject(. error)
       }
     )
     ->ignore

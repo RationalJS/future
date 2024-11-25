@@ -13,45 +13,45 @@ let map5: (t<'a>, t<'b>, t<'c>, t<'d>, t<'e>, ('a, 'b, 'c, 'd, 'e) => 'f) => t<'
 let all: list<t<'a>> => t<list<'a>>
 let tap: (t<'a>, 'a => unit) => t<'a>
 let get: (t<'a>, 'a => unit) => unit
-let mapOk: (t<Belt.Result.t<'a, 'b>>, 'a => 'c) => t<Belt.Result.t<'c, 'b>>
-let mapError: (t<Belt.Result.t<'a, 'b>>, 'b => 'c) => t<Belt.Result.t<'a, 'c>>
-let flatMapOk: (t<Belt.Result.t<'a, 'b>>, 'a => t<Belt.Result.t<'c, 'b>>) => t<
-  Belt.Result.t<'c, 'b>,
+let mapOk: (t<result<'a, 'b>>, 'a => 'c) => t<result<'c, 'b>>
+let mapError: (t<result<'a, 'b>>, 'b => 'c) => t<result<'a, 'c>>
+let flatMapOk: (t<result<'a, 'b>>, 'a => t<result<'c, 'b>>) => t<
+  result<'c, 'b>,
 >
-let flatMapOkPure: (t<Belt.Result.t<'a, 'b>>, 'a => Belt.Result.t<'c, 'b>) => t<
-  Belt.Result.t<'c, 'b>,
+let flatMapOkPure: (t<result<'a, 'b>>, 'a => result<'c, 'b>) => t<
+  result<'c, 'b>,
 >
-let flatMapError: (t<Belt.Result.t<'a, 'b>>, 'b => t<Belt.Result.t<'a, 'c>>) => t<
-  Belt.Result.t<'a, 'c>,
+let flatMapError: (t<result<'a, 'b>>, 'b => t<result<'a, 'c>>) => t<
+  result<'a, 'c>,
 >
-let mapOk2: (t<Belt.Result.t<'a, 'b>>, t<Belt.Result.t<'c, 'b>>, ('a, 'c) => 'd) => t<
-  Belt.Result.t<'d, 'b>,
+let mapOk2: (t<result<'a, 'b>>, t<result<'c, 'b>>, ('a, 'c) => 'd) => t<
+  result<'d, 'b>,
 >
 let mapOk3: (
-  t<Belt.Result.t<'a, 'b>>,
-  t<Belt.Result.t<'c, 'b>>,
-  t<Belt.Result.t<'d, 'b>>,
+  t<result<'a, 'b>>,
+  t<result<'c, 'b>>,
+  t<result<'d, 'b>>,
   ('a, 'c, 'd) => 'e,
-) => t<Belt.Result.t<'e, 'b>>
+) => t<result<'e, 'b>>
 let mapOk4: (
-  t<Belt.Result.t<'a, 'b>>,
-  t<Belt.Result.t<'c, 'b>>,
-  t<Belt.Result.t<'d, 'b>>,
-  t<Belt.Result.t<'e, 'b>>,
+  t<result<'a, 'b>>,
+  t<result<'c, 'b>>,
+  t<result<'d, 'b>>,
+  t<result<'e, 'b>>,
   ('a, 'c, 'd, 'e) => 'f,
-) => t<Belt.Result.t<'f, 'b>>
+) => t<result<'f, 'b>>
 let mapOk5: (
-  t<Belt.Result.t<'a, 'b>>,
-  t<Belt.Result.t<'c, 'b>>,
-  t<Belt.Result.t<'d, 'b>>,
-  t<Belt.Result.t<'e, 'b>>,
-  t<Belt.Result.t<'f, 'b>>,
+  t<result<'a, 'b>>,
+  t<result<'c, 'b>>,
+  t<result<'d, 'b>>,
+  t<result<'e, 'b>>,
+  t<result<'f, 'b>>,
   ('a, 'c, 'd, 'e, 'f) => 'g,
-) => t<Belt.Result.t<'g, 'b>>
-let tapOk: (t<Belt.Result.t<'a, 'b>>, 'a => 'c) => t<Belt.Result.t<'a, 'b>>
-let tapError: (t<Belt.Result.t<'a, 'b>>, 'b => 'c) => t<Belt.Result.t<'a, 'b>>
+) => t<result<'g, 'b>>
+let tapOk: (t<result<'a, 'b>>, 'a => 'c) => t<result<'a, 'b>>
+let tapError: (t<result<'a, 'b>>, 'b => 'c) => t<result<'a, 'b>>
 let delay: (~executor: executorType=?, int, unit => 'a) => t<'a>
 let sleep: (~executor: executorType=?, int) => t<unit>
-let \">>=": (t<Belt.Result.t<'a, 'b>>, 'a => t<Belt.Result.t<'c, 'b>>) => t<Belt.Result.t<'c, 'b>>
-let \">>==": (t<Belt.Result.t<'a, 'b>>, 'a => Belt.Result.t<'c, 'b>) => t<Belt.Result.t<'c, 'b>>
-let \"<$>": (t<Belt.Result.t<'a, 'b>>, 'a => 'c) => t<Belt.Result.t<'c, 'b>>
+let \">>=": (t<result<'a, 'b>>, 'a => t<result<'c, 'b>>) => t<result<'c, 'b>>
+let \">>==": (t<result<'a, 'b>>, 'a => result<'c, 'b>) => t<result<'c, 'b>>
+let \"<$>": (t<result<'a, 'b>>, 'a => 'c) => t<result<'c, 'b>>

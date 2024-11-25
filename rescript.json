@@ -1,22 +1,26 @@
 {
   "name": "reason-future",
-  "version": "2.5.0",
-  "sources": [{
-    "dir" : "src",
-    "subdirs" : true
-  }, {
-    "dir" : "__tests__",
-    "type" : "dev"
-  }],
+  "version": "3.0.0",
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "__tests__",
+      "type": "dev"
+    }
+  ],
   "package-specs": {
     "module": "commonjs",
     "in-source": true
   },
   "suffix": ".bs.js",
-  "bs-dependencies": [],
+  "bs-dependencies": ["@rescript/core"],
   "bs-dev-dependencies": ["@glennsl/rescript-jest"],
+  "bsc-flags": ["-open RescriptCore"],
   "warnings": {
-    "error" : "+101"
+    "error": "+101"
   },
   "namespace": false,
   "refmt": 3

@@ -1,6 +1,6 @@
 {
   "name": "reason-future",
-  "version": "2.6.0",
+  "version": "3.0.0",
   "scripts": {
     "build": "rescript build -with-deps",
     "start": "rescript build -with-deps -w",
@@ -12,11 +12,15 @@
     "src/Future.res",
     "src/FutureResult.res",
     "src/FutureJs.res",
-    "bsconfig.json",
+    "rescript.json",
     "README.md"
   ],
   "keywords": [
-    "BuckleScript"
+    "Rescript",
+    "Future",
+    "Promise",
+    "JavaScript",
+    "Async"
   ],
   "author": "",
   "license": "MIT",
@@ -25,9 +29,11 @@
     "coveralls": "3.1.0",
     "rescript": "11.1.4"
   },
-  "description": "A Js.Promise alternative for ReasonML.",
+  "description": "A lightweight, functional alternative to Js.Promise for ReScript, designed for better composability and error handling.",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "@rescript/core": "^1.6.1"
+  },
   "peerDependencies": {
     "rescript": "^11.1.4"
   },
