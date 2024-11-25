@@ -97,7 +97,7 @@ let get = (Future(getFn, _), f) => getFn(f)
  * Future Result convenience functions,
  * for working with a type Future.t( result('a,'b) )
  */
-let mapOk: (t<result<'a, 'b>>, 'a => 'c) => t<result<'c, 'b>> = (future, f) =>
+let mapOk = (future, f) =>
   future->map(r => Result.map(r, f))
 
 let mapError = (future, f) =>
