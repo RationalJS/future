@@ -5,14 +5,14 @@ describe("Future", () => {
   testAsync("sync chaining", finish =>
     Future.value("one")
     ->Future.map(s => s ++ "!")
-    ->Future.get(s => s |> expect |> toEqual("one!") |> finish)
+    ->Future.get(s => s ->expect-> toEqual("one!")->finish)
   )
 
   testAsync("async chaining", finish =>
     Future.delay(25, () => 20)
     ->Future.map(s => string_of_int(s))
     ->Future.map(s => s ++ "!")
-    ->Future.get(s => s |> expect |> toEqual("20!") |> finish)
+    ->Future.get(s => s ->expect-> toEqual("20!")->finish)
   )
 
   testAsync("tap", finish => {
@@ -21,18 +21,18 @@ describe("Future", () => {
     Future.value(99)
     ->Future.tap(n => v := n + 1)
     ->Future.map(n => n - 9)
-    ->Future.get(n => (n, v.contents) |> expect |> toEqual((90, 100)) |> finish)
+    ->Future.get(n => (n, v.contents) ->expect-> toEqual((90, 100))->finish)
   })
 
   testAsync("flatMap", finish =>
     Future.value(59)
     ->Future.flatMap(n => Future.value(n + 1))
-    ->Future.get(n => n |> expect |> toEqual(60) |> finish)
+    ->Future.get(n => n ->expect-> toEqual(60)->finish)
   )
 
   testAsync("map2", finish =>
     Future.map2(Future.delay(20, () => 1), Future.value("a"), (num, str) => (num, str))->Future.get(
-      tup => tup |> expect |> toEqual((1, "a")) |> finish,
+      tup => tup ->expect-> toEqual((1, "a"))->finish,
     )
   )
 
@@ -44,7 +44,7 @@ describe("Future", () => {
       Future.delay(80, () => list{}),
       Future.delay(100, () => ()),
       (a, b, c, d, e) => (a, b, c, d, e),
-    )->Future.get(tup => tup |> expect |> toEqual((0, 1.2, "foo", list{}, ())) |> finish)
+    )->Future.get(tup => tup ->expect-> toEqual((0, 1.2, "foo", list{}, ()))->finish)
   )
 
   test("multiple gets", () => {
@@ -59,7 +59,7 @@ describe("Future", () => {
     future->Future.get(_ => ())
 
     future->Future.get(_ => ())
-    count.contents |> expect |> toBe(1)
+    count.contents ->expect-> toBe(1)
   })
 
   testAsync("multiple gets (async)", finish => {
@@ -72,7 +72,7 @@ describe("Future", () => {
 
     future->Future.get(_ => ())
 
-    future->Future.get(_ => (initialCount, count.contents) |> expect |> toEqual((0, 1)) |> finish)
+    future->Future.get(_ => (initialCount, count.contents) ->expect-> toEqual((0, 1))->finish)
   })
 
   testAsync("all (async)", finish =>
@@ -82,8 +82,8 @@ describe("Future", () => {
     }->Future.get(
       result =>
         switch result {
-        | list{1, 2, 3, 4} => pass |> finish
-        | _ => fail("Expected [1, 2, 3, 4]") |> finish
+        | list{1, 2, 3, 4} => pass->finish
+        | _ => fail("Expected [1, 2, 3, 4]")->finish
         },
     )
   )
@@ -99,7 +99,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok("two")
     ->Future.value
     ->Future.mapOk(s => s ++ "!")
-    ->Future.get(r => Belt.Result.getExn(r) |> expect |> toEqual("two!") |> finish)
+    ->Future.get(r => Belt.Result.getExn(r) ->expect-> toEqual("two!")->finish)
   )
 
   testAsync("mapOk 2", finish =>
@@ -109,8 +109,8 @@ describe("Future Belt.Result", () => {
     ->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("err2") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("err2")->finish
         },
     )
   )
@@ -119,7 +119,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok("three")
     ->Future.value
     ->Future.mapError(s => s ++ "!")
-    ->Future.get(r => Belt.Result.getExn(r) |> expect |> toEqual("three") |> finish)
+    ->Future.get(r => Belt.Result.getExn(r) ->expect-> toEqual("three")->finish)
   )
 
   testAsync("mapError 2", finish =>
@@ -129,8 +129,8 @@ describe("Future Belt.Result", () => {
     ->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("err3!") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("err3!")->finish
         },
     )
   )
@@ -139,7 +139,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok("four")
     ->Future.value
     ->Future.flatMapOk(s => Belt.Result.Ok(s ++ "!")->Future.value)
-    ->Future.get(r => Belt.Result.getExn(r) |> expect |> toEqual("four!") |> finish)
+    ->Future.get(r => Belt.Result.getExn(r) ->expect-> toEqual("four!")->finish)
   )
 
   testAsync("flatMapOk 2", finish =>
@@ -149,8 +149,8 @@ describe("Future Belt.Result", () => {
     ->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("err4.1") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("err4.1")->finish
         },
     )
   )
@@ -162,8 +162,8 @@ describe("Future Belt.Result", () => {
     ->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("err4!") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("err4!")->finish
         },
     )
   )
@@ -172,7 +172,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok("four")
     ->Future.value
     ->Future.flatMapOkPure(s => Belt.Result.Ok(s ++ "!"))
-    ->Future.get(r => Belt.Result.getExn(r) |> expect |> toEqual("four!") |> finish)
+    ->Future.get(r => Belt.Result.getExn(r) ->expect-> toEqual("four!")->finish)
   )
 
   testAsync("flatMapOkPure 2", finish =>
@@ -182,8 +182,8 @@ describe("Future Belt.Result", () => {
     ->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("err4.1") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("err4.1")->finish
         },
     )
   )
@@ -192,7 +192,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok("five")
     ->Future.value
     ->Future.flatMapError(s => Belt.Result.Error(s ++ "!")->Future.value)
-    ->Future.get(r => Belt.Result.getExn(r) |> expect |> toEqual("five") |> finish)
+    ->Future.get(r => Belt.Result.getExn(r) ->expect-> toEqual("five")->finish)
   )
 
   testAsync("flatMapError 2", finish =>
@@ -202,8 +202,8 @@ describe("Future Belt.Result", () => {
     ->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("err5!") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("err5!")->finish
         },
     )
   )
@@ -219,8 +219,8 @@ describe("Future Belt.Result", () => {
     )->Future.get(
       r =>
         switch r {
-        | Ok(tup) => tup |> expect |> toEqual((0, 1.1, "", list{}, Some("x"))) |> finish
-        | Error(_) => fail("shouldn't be possible") |> finish
+        | Ok(tup) => tup ->expect-> toEqual((0, 1.1, "", list{}, Some("x")))->finish
+        | Error(_) => fail("shouldn't be possible")->finish
         },
     )
   )
@@ -236,8 +236,8 @@ describe("Future Belt.Result", () => {
     )->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(x) => x |> expect |> toEqual("first") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(x) => x ->expect-> toEqual("first")->finish
         },
     )
   )
@@ -248,7 +248,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok(10)
     ->Future.value
     ->Future.tapOk(n => x := x.contents + n)
-    ->Future.get(_ => x.contents |> expect |> toEqual(11) |> finish)
+    ->Future.get(_ => x.contents ->expect-> toEqual(11)->finish)
   })
 
   testAsync("tapOk 2", finish => {
@@ -257,7 +257,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Error(10)
     ->Future.value
     ->Future.tapOk(n => y := y.contents + n)
-    ->Future.get(_ => y.contents |> expect |> toEqual(1) |> finish)
+    ->Future.get(_ => y.contents ->expect-> toEqual(1)->finish)
   })
 
   testAsync("tapError 1", finish => {
@@ -266,7 +266,7 @@ describe("Future Belt.Result", () => {
     Belt.Result.Ok(10)
     ->Future.value
     ->Future.tapError(n => x := x.contents + n)
-    ->Future.get(_ => x.contents |> expect |> toEqual(1) |> finish)
+    ->Future.get(_ => x.contents ->expect-> toEqual(1)->finish)
   })
 
   testAsync("tapError", finish => {
@@ -275,13 +275,13 @@ describe("Future Belt.Result", () => {
     Belt.Result.Error(10)
     ->Future.value
     ->Future.tapError(n => y := y.contents + n)
-    ->Future.get(_ => y.contents |> expect |> toEqual(11) |> finish)
+    ->Future.get(_ => y.contents ->expect-> toEqual(11)->finish)
   })
   testAsync("<$> 1", finish =>
     \"<$>"(
       \"<$>"(Future.value(Belt.Result.Ok("infix ops")), x => x ++ " "),
       x => x ++ "rock!",
-    )->Future.get(r => r->Belt.Result.getExn |> expect |> toEqual("infix ops rock!") |> finish)
+    )->Future.get(r => r->Belt.Result.getExn ->expect-> toEqual("infix ops rock!")->finish)
   )
   testAsync("<$> 2", finish =>
     \"<$>"(
@@ -290,8 +290,8 @@ describe("Future Belt.Result", () => {
     )->Future.get(
       r =>
         switch r {
-        | Ok(_) => fail("shouldn't be possible") |> finish
-        | Error(e) => e |> expect |> toEqual("infix ops") |> finish
+        | Ok(_) => fail("shouldn't be possible")->finish
+        | Error(e) => e ->expect-> toEqual("infix ops")->finish
         },
     )
   )
@@ -300,7 +300,7 @@ describe("Future Belt.Result", () => {
     let appendToString = (appendedString, s) => (s ++ appendedString)->Belt.Result.Ok->Future.value
 
     \">>="(Future.value(Belt.Result.Ok("infix ops")), appendToString(" still rock!"))->Future.get(
-      r => r |> expect |> toEqual(Belt.Result.Ok("infix ops still rock!")) |> finish,
+      r => r ->expect-> toEqual(Belt.Result.Ok("infix ops still rock!"))->finish,
     )
   })
 
@@ -320,7 +320,7 @@ describe("Future Belt.Result", () => {
             loop(x')
           },
       )
-    loop(0)->Future.get(r => r |> expect |> toBeGreaterThan(numberOfLoops) |> finish)
+    loop(0)->Future.get(r => r ->expect-> toBeGreaterThan(numberOfLoops)->finish)
   })
 
   testAsync("async recursion is stack safe", finish => {
@@ -335,6 +335,6 @@ describe("Future Belt.Result", () => {
             loop(x')
           },
       )
-    loop(0)->Future.get(r => r |> expect |> toEqual(numberOfLoops) |> finish)
+    loop(0)->Future.get(r => r ->expect-> toEqual(numberOfLoops)->finish)
   })
 })

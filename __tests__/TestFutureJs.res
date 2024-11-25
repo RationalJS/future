@@ -9,7 +9,7 @@ describe("FutureJs", () => {
   testAsync("fromPromise (resolved)", finish =>
     Js.Promise.resolve(42)
     ->FutureJs.fromPromise(errorTransformer)
-    ->Future.get(r => Belt.Result.getExn(r) |> expect |> toEqual(42) |> finish)
+    ->Future.get(r => Belt.Result.getExn(r) ->expect-> toEqual(42)->finish)
   )
 
   testAsync("fromPromise (rejected)", finish => {
@@ -18,8 +18,8 @@ describe("FutureJs", () => {
     ->FutureJs.fromPromise(errorTransformer)
     ->Future.get(r =>
       switch r {
-      | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
-      | Belt.Result.Error(_) => pass |> finish
+      | Belt.Result.Ok(_) => fail("shouldn't be possible")->finish
+      | Belt.Result.Error(_) => pass->finish
       }
     )
   })
@@ -30,8 +30,8 @@ describe("FutureJs", () => {
 
     FutureJs.fromPromise(promise, errorTransformer)->Future.get(r =>
       switch r {
-      | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
-      | Belt.Result.Error(_) => pass |> finish
+      | Belt.Result.Ok(_) => fail("shouldn't be possible")->finish
+      | Belt.Result.Error(_) => pass->finish
       }
     )
   })
@@ -42,8 +42,8 @@ describe("FutureJs", () => {
 
     FutureJs.fromPromise(promise, errorTransformer)->Future.get(r =>
       switch r {
-      | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
-      | Belt.Result.Error(_) => pass |> finish
+      | Belt.Result.Ok(_) => fail("shouldn't be possible")->finish
+      | Belt.Result.Error(_) => pass->finish
       }
     )
   })
@@ -55,8 +55,8 @@ describe("FutureJs", () => {
 
     FutureJs.fromPromise(promise, errorTransformer)->Future.get(r =>
       switch r {
-      | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
-      | Belt.Result.Error(_) => pass |> finish
+      | Belt.Result.Ok(_) => fail("shouldn't be possible")->finish
+      | Belt.Result.Error(_) => pass->finish
       }
     )
   })
@@ -71,8 +71,8 @@ describe("FutureJs", () => {
     ->Future.flatMapOk(_ => future())
     ->Future.get(r =>
       switch r {
-      | Belt.Result.Ok(_) => fail("shouldn't be possible") |> finish
-      | Belt.Result.Error(_) => pass |> finish
+      | Belt.Result.Ok(_) => fail("shouldn't be possible")->finish
+      | Belt.Result.Error(_) => pass->finish
       }
     )
   })
@@ -80,14 +80,14 @@ describe("FutureJs", () => {
     Future.delay(5, () => "payload")
     |> FutureJs.toPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.then_(x => Js.Promise.resolve(x |> expect |> toEqual("payload")))
+    |> Js.Promise.then_(x => Js.Promise.resolve(x ->expect-> toEqual("payload")))
   )
 
   testPromise("resultToPromise (Ok result)", () =>
     Future.delay(5, () => Belt.Result.Ok("payload"))
     |> FutureJs.resultToPromise
     |> Js.Promise.catch(_ => raise(TestError("shouldn't be possible")))
-    |> Js.Promise.then_(x => Js.Promise.resolve(x |> expect |> toEqual("payload")))
+    |> Js.Promise.then_(x => Js.Promise.resolve(x ->expect-> toEqual("payload")))
   )
 
   testPromise("resultToPromise (Error exn)", () => {
