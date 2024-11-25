@@ -1,5 +1,5 @@
 @ocaml.doc("
- * Translate a Js.Promise to a Future(result)
+ * Translate a Promise to a Future(result)
  *
  * errorTransformer: (Promise.error) => 'a
  * - The errorTransformer will provide you with the raw Promise.error
@@ -9,7 +9,7 @@
  * - A good start is translating the Promise.error to a string.
  *   ```reason
  *   let errorTransformer = (error) =>
- *     Js.String.make(error)
+ *     String.make(error)
  *     ->(str => /*... do your transforms here */ str);
 *    ```
  ")

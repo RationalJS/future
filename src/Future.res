@@ -9,14 +9,14 @@ let trampoline = {
   let callbacks = []
   let rec runLoop = callback => {
     callback()
-    switch Js.Array.pop(callbacks) {
+    switch Array.pop(callbacks) {
     | None => ()
     | Some(callback) => runLoop(callback)
     }
   }
   callback =>
     if running.contents {
-      ignore(Js.Array.unshift(callback, callbacks))
+      ignore(Array.unshift(callbacks, callback))
     } else {
       running := true
       runLoop(callback)
@@ -97,8 +97,7 @@ let get = (Future(getFn, _), f) => getFn(f)
  * Future Result convenience functions,
  * for working with a type Future.t( result('a,'b) )
  */
-let mapOk = (future, f) =>
-  future->map(r => Result.map(r, f))
+let mapOk = (future, f) => future->map(r => Result.map(r, f))
 
 let mapError = (future, f) =>
   future->map(r =>
