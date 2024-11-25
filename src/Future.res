@@ -16,7 +16,7 @@ let trampoline = {
   }
   callback =>
     if running.contents {
-      Js.Array.unshift(callback, callbacks) |> ignore
+      ignore(Js.Array.unshift(callback, callbacks))
     } else {
       running := true
       runLoop(callback)
@@ -37,7 +37,7 @@ let make = (~executor: executorType=#none, resolver) => {
     switch data.contents {
     | None =>
       data := Some(result)
-      callbacks.contents->Belt.List.reverse->Belt.List.forEach(runCallback(result))
+      callbacks.contents->Belt.List.reverse->Belt.List.forEach(cb => runCallback(result, cb))
       /* Clean up memory usage */
       callbacks := list{}
     | Some(_) => () /* Do nothing; theoretically not possible */
@@ -69,11 +69,18 @@ let flatMap = (Future(get, executor), f) =>
 
 let map2 = (fa, fb, f) => flatMap(fa, a => map(fb, b => f(a, b)))
 
-let map3 = (fa, fb, fc, f) => map2(map2(fa, fb, f), fc, v => v)
+// let map3 = (fa, fb, fc, f) => map2(map2(fa, fb, f), fc, v => v)
+let map3 = (fa, fb, fc, f) => map2(map2(fa, fb, (a, b) => (a, b)), fc, ((a, b), c) => f(a, b, c))
 
-let map4 = (fa, fb, fc, fd, f) => map3(map2(fa, fb, f), fc, fd, v => v)
+// let map4 = (fa, fb, fc, fd, f) => map3(map2(fa, fb, f), fc, fd, v => v)
+let map4 = (fa, fb, fc, fd, f) =>
+  map2(map3(fa, fb, fc, (a, b, c) => (a, b, c)), fd, ((a, b, c), d) => f(a, b, c, d))
 
-let map5 = (fa, fb, fc, fd, fe, f) => map4(map2(fa, fb, f), fc, fd, fe, v => v)
+// let map5 = (fa, fb, fc, fd, fe, f) => map4(map2(fa, fb, f), fc, fd, fe, v => v)
+let map5 = (fa, fb, fc, fd, fe, f) =>
+  map2(map4(fa, fb, fc, fd, (a, b, c, d) => (a, b, c, d)), fe, ((a, b, c, d), e) =>
+    f(a, b, c, d, e)
+  )
 
 let rec all = futures =>
   switch futures {
@@ -93,7 +100,8 @@ let get = (Future(getFn, _), f) => getFn(f)
  * Future Belt.Result convenience functions,
  * for working with a type Future.t( Belt.Result.t('a,'b) )
  */
-let mapOk = (future, f) => future->map(r => Belt.Result.map(r, f))
+let mapOk: (t<Belt.Result.t<'a, 'b>>, 'a => 'c) => t<Belt.Result.t<'c, 'b>> = (future, f) =>
+  future->map(r => Belt.Result.map(r, f))
 
 let mapError = (future, f) =>
   future->map(r =>
@@ -123,11 +131,16 @@ let flatMapError = (future, f) =>
 
 let mapOk2 = (fa, fb, f) => flatMapOk(fa, a => mapOk(fb, b => f(a, b)))
 
-let mapOk3 = (fa, fb, fc, f) => mapOk2(mapOk2(fa, fb, f), fc, v => v)
+let mapOk3 = (fa, fb, fc, f) =>
+  mapOk2(mapOk2(fa, fb, (a, b) => (a, b)), fc, ((a, b), c) => f(a, b, c))
 
-let mapOk4 = (fa, fb, fc, fd, f) => mapOk3(mapOk2(fa, fb, f), fc, fd, v => v)
+let mapOk4 = (fa, fb, fc, fd, f) =>
+  mapOk2(mapOk3(fa, fb, fc, (a, b, c) => (a, b, c)), fd, ((a, b, c), d) => f(a, b, c, d))
 
-let mapOk5 = (fa, fb, fc, fd, fe, f) => mapOk4(mapOk2(fa, fb, f), fc, fd, fe, v => v)
+let mapOk5 = (fa, fb, fc, fd, fe, f) =>
+  mapOk2(mapOk4(fa, fb, fc, fd, (a, b, c, d) => (a, b, c, d)), fe, ((a, b, c, d), e) =>
+    f(a, b, c, d, e)
+  )
 
 let tapOk = (future, f) =>
   future->tap(r =>
@@ -146,7 +159,7 @@ let tapError = (future, f) =>
   )
 
 let delay = (~executor=?, ms, f) =>
-  make(~executor?, resolve => Js.Global.setTimeout(() => f() |> resolve, ms)->ignore)
+  make(~executor?, resolve => Js.Global.setTimeout(() => resolve(f()), ms)->ignore)
 
 let sleep = (~executor=?, ms) => delay(~executor?, ms, () => ())
 

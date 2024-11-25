@@ -1,6 +1,7 @@
 type getFn<'a> = ('a => unit) => unit
 type executorType = [#none | #trampoline]
-type t<'a>
+type t<'a> = Future(getFn<'a>, executorType)
+let trampoline: (unit => unit) => unit
 let make: (~executor: executorType=?, ('a => unit) => 'b) => t<'a>
 let value: (~executor: executorType=?, 'a) => t<'a>
 let map: (t<'a>, 'a => 'b) => t<'b>
@@ -14,23 +15,18 @@ let tap: (t<'a>, 'a => unit) => t<'a>
 let get: (t<'a>, 'a => unit) => unit
 let mapOk: (t<Belt.Result.t<'a, 'b>>, 'a => 'c) => t<Belt.Result.t<'c, 'b>>
 let mapError: (t<Belt.Result.t<'a, 'b>>, 'b => 'c) => t<Belt.Result.t<'a, 'c>>
-let flatMapOk: (
-  t<Belt.Result.t<'a, 'b>>,
-  'a => t<Belt.Result.t<'c, 'b>>,
-) => t<Belt.Result.t<'c, 'b>>
-let flatMapOkPure: (
-  t<Belt.Result.t<'a, 'b>>,
-  'a => Belt.Result.t<'c, 'b>,
-) => t<Belt.Result.t<'c, 'b>>
-let flatMapError: (
-  t<Belt.Result.t<'a, 'b>>,
-  'b => t<Belt.Result.t<'a, 'c>>,
-) => t<Belt.Result.t<'a, 'c>>
-let mapOk2: (
-  t<Belt.Result.t<'a, 'b>>,
-  t<Belt.Result.t<'c, 'b>>,
-  ('a, 'c) => 'd,
-) => t<Belt.Result.t<'d, 'b>>
+let flatMapOk: (t<Belt.Result.t<'a, 'b>>, 'a => t<Belt.Result.t<'c, 'b>>) => t<
+  Belt.Result.t<'c, 'b>,
+>
+let flatMapOkPure: (t<Belt.Result.t<'a, 'b>>, 'a => Belt.Result.t<'c, 'b>) => t<
+  Belt.Result.t<'c, 'b>,
+>
+let flatMapError: (t<Belt.Result.t<'a, 'b>>, 'b => t<Belt.Result.t<'a, 'c>>) => t<
+  Belt.Result.t<'a, 'c>,
+>
+let mapOk2: (t<Belt.Result.t<'a, 'b>>, t<Belt.Result.t<'c, 'b>>, ('a, 'c) => 'd) => t<
+  Belt.Result.t<'d, 'b>,
+>
 let mapOk3: (
   t<Belt.Result.t<'a, 'b>>,
   t<Belt.Result.t<'c, 'b>>,
