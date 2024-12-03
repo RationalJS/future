@@ -4,9 +4,14 @@
 
 # The Future is Now
 
-Future is a `Js.Promise` alternative. It is written in ReasonML.
+Future is a lightweight, functional alternative to `Js.Promise` for ReScript, designed to make async code more composable and maintainable.
 
-Compared to a promise, a future is:
+### Compatibility
+- Use `reason-future@2.6.0` for ReasonML or ReScript ≤ v10.
+- Use `reason-future@3.0.0` for ReScript ≥ v11.
+
+
+### Key Benefits of Using Future Over Promises:
 
 - **Lighter weight** – Only ~25 lines of implementation.
 - **Simpler** – Futures only resolve to a single type (as opposed to resolve and reject types), giving you more flexibility on your error handling.
@@ -14,13 +19,13 @@ Compared to a promise, a future is:
 
 ## Installation
 
-First make sure you have bs-platform `>= 3.1.0`. Then install with npm:
+First make sure you have rescript `>= 11.1.X`. Then install with npm:
 
 ```
 $ npm install --save reason-future
 ```
 
-Then add `"reason-future"` to your `bsconfig.json` dev dependencies:
+Then add `"reason-future"` to your `rescript.json` dev dependencies:
 
 ```
 {
@@ -33,7 +38,7 @@ Then add `"reason-future"` to your `bsconfig.json` dev dependencies:
 
 ## Basic Usage
 
-To create a task, use `Future.make`. It provides a single `resolve` function, like a promise with no `reject`:
+To create a task, use `Future.make`. It provides a single `resolve` function, similar to how Promises work but without a `reject`:
 
 ```js
 let futureGreeting = Future.make(resolve => resolve("hi"));
@@ -79,7 +84,7 @@ let ft_b = futureNum->Future.flatMap(n => Future.value(n + 20));
 
 ## API
 
-Core functions. **Note:** `_` represents the future itself as inserted by `->` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
+Core functions. **Note:** `_` represents the future itself as inserted by `->` (the [pipe](https://rescript-lang.org/docs/manual/latest/pipe) operator).
 
 - `Future.make(resolver)` - Create a new, potentially-async future.
 - `Future.value(x)` - Create a new future with a plain value (synchronous).
@@ -89,15 +94,15 @@ Core functions. **Note:** `_` represents the future itself as inserted by `->` (
 - `Future.tap(_,fn)` - Do something with the value of a future without changing it. Returns the same future so you can continue using it in a pipeline. Convenient for side effects such as console logging.
 - `Future.all(_,fn)` - Turn a list of futures into a future of a list.  Used when you want to wait for a collection of futures to complete before doing something (equivalent to Promise.all in Javascript).
 
-### Belt.Result
+### Result
 
-Convenience functions when working with a future `Belt.Result`. **Note:** `_` represents the future itself as inserted by `->` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
+Convenience functions when working with a future `Result`. **Note:** `_` represents the future itself as inserted by `->` (the [pipe](https://rescript-lang.org/docs/manual/latest/pipe) operator).
 
-**Note 2**: The terms `Result.Ok` and `Result.Error` in this context are expected to be read as `Belt.Result.Ok` and `Belt.Result.Error`.
+**Note 2**: The terms `Result.Ok` and `Result.Error` in this context are expected to be read as `Ok` and `Error`.
 
 - `Future.mapOk(_,fn)` - Transform a future value into another value, but only if the value is an `Result.Ok`. Similar to `Promise.prototype.then`
 - `Future.mapError(_,fn)` - Transform a future value into another value, but only if the value is an `Result.Error`. Similar to `Promise.prototype.catch`
-- `Future.tapOk(_,fn)` - Do something with the value of a future without changing it, but only if the value is a `Belt.Result.Ok`. Returns the same future. Convenience for side effects such as console logging.
+- `Future.tapOk(_,fn)` - Do something with the value of a future without changing it, but only if the value is a `Ok`. Returns the same future. Convenience for side effects such as console logging.
 - `Future.tapError(_,fn)` - Same as `tapOk` but for `Result.Error`
 
 The following are more situational:
@@ -112,18 +117,18 @@ a future `Result`. Flattens the inner future.
 Convenience functions for interop with JavaScript land.
 
 - `FutureJs.fromPromise(promise, errorTransformer)`
-  - `promise` is the `Js.Promise.t('a)` that will be transformed into a
-    `Future.t(Belt.Result.t('a, 'e))`
-  - `errorTransformer` allows you to determine how `Js.Promise.error`
+  - `promise` is the `RescriptCore.Promise.t('a)` that will be transformed into a
+    `Future.t(result('a, 'e))`
+  - `errorTransformer` allows you to determine how `Promise.error`
     objects will be transformed before they are returned wrapped within
-    a `Belt.Result.Error`.  This allows you to implement the error handling
+    a `Error`.  This allows you to implement the error handling
     method which best meets your application's needs.
 - `FutureJs.toPromise(future)`
   - `future` is any `Future.t('a)` which is transformed into a
-    `Js.Promise.t('a)`. Always resolves, never rejects the promise.
+    `RescriptCore.Promise.t('a)`. Always resolves, never rejects the promise.
 - `FutureJs.resultToPromise(future)`
-  - `future` is the `Future.t(Belt.Result('a, 'e))` which is transformed into a
-    `Js.Promise.t('a)`. Resolves the promise on Ok result and rejects on Error result.
+  - `future` is the `Future.t(result('a, 'e))` which is transformed into a
+    `RescriptCore.Promise.t('a)`. Resolves the promise on Ok result and rejects on Error result.
 
 Example use:
 
