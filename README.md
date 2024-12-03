@@ -6,6 +6,11 @@
 
 Future is a lightweight, functional alternative to `Js.Promise` for ReScript, designed to make async code more composable and maintainable.
 
+### Compatibility
+- Use `reason-future@2.6.0` for ReasonML or ReScript ≤ v10.
+- Use `reason-future@3.0.0` for ReScript ≥ v11.
+
+
 ### Key Benefits of Using Future Over Promises:
 
 - **Lighter weight** – Only ~25 lines of implementation.
@@ -91,7 +96,7 @@ Core functions. **Note:** `_` represents the future itself as inserted by `->` (
 
 ### Result
 
-Convenience functions when working with a future `Result`. **Note:** `_` represents the future itself as inserted by `->` (the [fast pipe](https://bucklescript.github.io/docs/en/fast-pipe.html) operator).
+Convenience functions when working with a future `Result`. **Note:** `_` represents the future itself as inserted by `->` (the [pipe](https://rescript-lang.org/docs/manual/latest/pipe) operator).
 
 **Note 2**: The terms `Result.Ok` and `Result.Error` in this context are expected to be read as `Ok` and `Error`.
 
